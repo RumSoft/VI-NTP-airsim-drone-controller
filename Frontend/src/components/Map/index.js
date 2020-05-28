@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import { InteractiveMap } from "react-map-gl";
-import myImage from "./mapka2.jpg";
+import { InteractiveMap, Marker } from "react-map-gl";
 import { Config } from "../..";
 import { DroneService } from "../../services";
+import droneIcon from "./drone-icon-arrow.png";
+import map from "./map.jpg";
+import "./index.scss";
 
 export default class Map extends Component {
   constructor() {
@@ -13,29 +15,60 @@ export default class Map extends Component {
         height: "100vh",
         zoom: 17,
       },
-      drone: {
-        position: [47.641482, -122.140364],
-      },
+      drone: {},
       pooling: {
-        delay: 300,
+        delay: 500,
       },
     };
 
     this.tick = () => {
-      DroneService.getState();
+      DroneService.getState().then((x) => this.setState({ drone: x }));
     };
+
+    //init & move map to drone
+    DroneService.getState().then((x) => {
+      this.setState({
+        viewport: {
+          ...this.state.viewport,
+          longitude: x.longitude,
+          latitude: x.latitude,
+        },
+        drone: x,
+      });
+    });
+
+    window.addEventListener("resize", () => {
+      this.setState({
+        viewport: {
+          ...this.state.viewport,
+          width: "100%",
+          height: "100vh",
+        },
+      });
+    });
   }
 
   render() {
+    const drone = this.state.drone;
     return (
-      <div>
+      <div ref={(r) => (this.container = r)}>
         <InteractiveMap
           ref={(r) => (this.map = r)}
           {...this.state.viewport}
           mapStyle={Config.MAPBOX_STYLE}
           mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
           onViewportChange={(viewport) => this.setState({ viewport })}
-        />
+          onContextMenu={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <Marker
+            latitude={drone.latitude || 0}
+            longitude={drone.longitude || 0}
+          >
+            <img src={droneIcon} className="drone-icon" />
+          </Marker>
+        </InteractiveMap>
         <canvas
           id="myCanvas"
           ref={(r) => (this.canvas = r)}
@@ -43,7 +76,7 @@ export default class Map extends Component {
           height="1540"
           hidden
         ></canvas>
-        <img id="xddd" ref={(r) => (this.im = r)} src={myImage} hidden />
+        <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
       </div>
     );
   }
@@ -54,21 +87,19 @@ export default class Map extends Component {
     this.im.addEventListener("load", () => {
       ctx.drawImage(this.im, 0, 0);
     });
-    console.log("a");
 
     this.interval = setInterval(this.tick, this.state.pooling.delay);
   }
 
   componentWillUnmount() {
-    console.log("will unmount");
     clearInterval(this.interval);
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log("did update");
-    if (prevState.pooling.delay !== this.state.pooling.delay) {
+    const delay = this.state.pooling.delay;
+    if (prevState.pooling.delay !== delay) {
       clearInterval(this.interval);
-      this.interval = setInterval(this.tick, this.state.pooling.delay);
+      this.interval = setInterval(this.tick, delay);
     }
   }
 }

@@ -1,3 +1,5 @@
 import { Config } from "..";
 
-export default {};
+export default {
+    get(url) 
+};

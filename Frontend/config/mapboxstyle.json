@@ -4465,7 +4465,7 @@
       "id": "overlay",
       "source": "overlay",
       "type": "raster",
-      "paint": { "raster-opacity": 0.85 }
+      "paint": { "raster-opacity": 0.95 }
     }
   ],
   "created": "2020-05-28T12:22:52.951Z",
