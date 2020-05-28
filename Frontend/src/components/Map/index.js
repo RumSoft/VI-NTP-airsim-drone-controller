@@ -9,6 +9,7 @@ import "./index.scss";
 export default class Map extends Component {
   constructor() {
     super();
+
     this.state = {
       viewport: {
         width: "100%",
@@ -19,10 +20,6 @@ export default class Map extends Component {
       pooling: {
         delay: 500,
       },
-    };
-
-    this.tick = () => {
-      DroneService.getState().then((x) => this.setState({ drone: x }));
     };
 
     //init & move map to drone
@@ -58,9 +55,7 @@ export default class Map extends Component {
           mapStyle={Config.MAPBOX_STYLE}
           mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
           onViewportChange={(viewport) => this.setState({ viewport })}
-          onContextMenu={(e) => {
-            e.preventDefault();
-          }}
+          onContextMenu={(e) => this.handleRightClickMenu(e)}
         >
           <Marker
             latitude={drone.latitude || 0}
@@ -88,7 +83,7 @@ export default class Map extends Component {
       ctx.drawImage(this.im, 0, 0);
     });
 
-    this.interval = setInterval(this.tick, this.state.pooling.delay);
+    this.interval = setInterval(() => this.tick(), this.state.pooling.delay);
   }
 
   componentWillUnmount() {
@@ -101,5 +96,14 @@ export default class Map extends Component {
       clearInterval(this.interval);
       this.interval = setInterval(this.tick, delay);
     }
+  }
+
+  tick() {
+    DroneService.getState().then((x) => this.setState({ drone: x }));
+  }
+
+  handleRightClickMenu(event) {
+    event.preventDefault();
+    console.log("xd", event);
   }
 }

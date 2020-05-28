@@ -14,7 +14,8 @@ const darkTheme = createMuiTheme({
 });
 
 export default () => (
-  <MuiThemeProvider theme={darkTheme}>
+  <MuiThemeProvider>
+    {/* <MuiThemeProvider theme={darkTheme}> */}
     <CssBaseline />
     <Layout />
   </MuiThemeProvider>

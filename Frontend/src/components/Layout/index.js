@@ -13,7 +13,10 @@ export default class Layout extends Component {
         </Grid>
         <Grid item className="sidebar">
           <img src={logo} className="logo" />
-          <hr />
+          <h1>Status</h1>
+          <p> ////////////////////// </p>
+          <h1>Trasa</h1>
+          <p> ////////////////////// </p>
         </Grid>
       </Grid>
     );
