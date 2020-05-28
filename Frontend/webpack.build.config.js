@@ -36,6 +36,10 @@ module.exports = {
         test: /\.jsx?$/,
         use: [{ loader: "babel-loader" }],
         include: defaultInclude,
+        query: {
+          presets: ["react", "es2015"],
+          plugins: ["transform-class-properties"],
+        },
       },
       {
         test: /\.(jpe?g|png|gif)$/,
