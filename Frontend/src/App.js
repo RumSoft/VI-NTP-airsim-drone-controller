@@ -17,18 +17,27 @@ class App extends Component {
     this.init();
   }
 
+  //init data fetch with fallback values if no api
   init() {
-    DroneService.getState().then((x) => {
-      this.setState({
-        latitude: x.latitude,
-        longitude: x.longitude,
-        isDataReady: true,
+    DroneService.getState()
+      .then((x) => {
+        this.setState({
+          isDataReady: true,
+          latitude: x.latitude,
+          longitude: x.longitude,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          isDataReady: true,
+          latitude: 47.641482, //fallback values
+          longitude: -122.140364,
+        });
       });
-    });
   }
 
   tick() {
-    DroneService.getState().then((x) => {
+    return DroneService.getState().then((x) => {
       this.setState({
         latitude: x.latitude,
         longitude: x.longitude,
@@ -63,6 +72,8 @@ class App extends Component {
       </Grid>
     );
   }
+
+  componentDidMount() {}
 }
 
 export default WithPooling(App);

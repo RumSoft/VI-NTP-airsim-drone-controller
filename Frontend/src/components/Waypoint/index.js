@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "./index.scss";
 
 export default class Waypoint extends Component {
   render() {
@@ -6,7 +7,7 @@ export default class Waypoint extends Component {
     const lng = (this.props.longitude || 0).toFixed(6);
 
     return (
-      <div>
+      <div className="waypoint">
         <p style={{ color: this.props.color }}>XX</p>
         {lat}, {lng}
       </div>

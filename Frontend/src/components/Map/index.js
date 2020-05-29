@@ -1,5 +1,10 @@
 import React, { Component } from "react";
-import ReactMapGL, { InteractiveMap, Marker } from "react-map-gl";
+import ReactMapGL, {
+  InteractiveMap,
+  Marker,
+  Source,
+  Layer,
+} from "react-map-gl";
 import { Config } from "../..";
 import droneIcon from "./drone-icon-arrow.png";
 import map from "./map.jpg";
@@ -35,9 +40,21 @@ export default class Map extends Component {
 
   render() {
     const contextMenu = this.state.contextMenu;
-    const lngLat = contextMenu && {
+    const contextMenuLngLat = contextMenu && {
       latitude: contextMenu.latitude,
       longitude: contextMenu.longitude,
+    };
+
+    const polylineGeoJSON = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [this.props.longitude, this.props.latitude],
+          ...this.props.waypoints.map((x) => [x.longitude, x.latitude]),
+        ],
+      },
     };
     return (
       <div className="map">
@@ -65,6 +82,21 @@ export default class Map extends Component {
           >
             <img src={droneIcon} className="drone-icon" />
           </Marker>
+          <Source id="polylineLayer" type="geojson" data={polylineGeoJSON}>
+            <Layer
+              id="lineLayer"
+              type="line"
+              source="my-data"
+              layout={{
+                "line-join": "round",
+                "line-cap": "round",
+              }}
+              paint={{
+                "line-color": "rgba(3, 170, 238, 1)",
+                "line-width": 5,
+              }}
+            />
+          </Source>
         </InteractiveMap>
         <canvas
           id="myCanvas"
@@ -80,7 +112,7 @@ export default class Map extends Component {
             ref={(r) => (this.contextMenu = r)}
             x={contextMenu.x}
             y={contextMenu.y}
-            {...lngLat}
+            {...contextMenuLngLat}
             actions={[
               // {
               //   title: "Leć natychmiast",
@@ -93,7 +125,7 @@ export default class Map extends Component {
               {
                 title: "Dodaj do trasy",
                 onClick: () => {
-                  this.props.onWaypointAdd(lngLat);
+                  this.props.onWaypointAdd(contextMenuLngLat);
                   this.setState({ contextMenu: null });
                 },
               },
