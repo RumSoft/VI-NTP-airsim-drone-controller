@@ -62,7 +62,7 @@ export default class Map extends Component {
           ></canvas>
           <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
 
-          <ContextMenu id={map_context_menu}>
+          <ContextMenu className="context-menu" id={map_context_menu}>
             <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
               ContextMenu Item 1
             </MenuItem>
