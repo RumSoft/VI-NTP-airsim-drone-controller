@@ -10,3 +10,5 @@ document.body.appendChild(root);
 
 // Now we can render our application into it
 render(<App />, document.getElementById("root"));
+
+export { default as Config } from "./../config/default";
