@@ -7,4 +7,24 @@
     // margin: 0;
     // list-style-type: none;
     // list-style: none;
+
+    padding: 5px;
+
+    p {
+        margin: 0;
+        padding: 0;
+    }
+
+    &__title {}
+
+    &__coordinates {}
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+
+        button {
+            margin-top: 5px;
+        }
+    }
 }

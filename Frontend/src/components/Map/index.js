@@ -19,10 +19,7 @@ export default class Map extends Component {
         longitude: props.longitude,
       },
       hasRotated: false,
-      contextMenu: {
-        x: 0,
-        y: 0,
-      },
+      contextMenu: null,
     };
 
     window.addEventListener("resize", () => {
@@ -37,7 +34,11 @@ export default class Map extends Component {
   }
 
   render() {
-    let contextMenu = this.state.contextMenu;
+    const contextMenu = this.state.contextMenu;
+    const lngLat = contextMenu && {
+      latitude: contextMenu.latitude,
+      longitude: contextMenu.longitude,
+    };
     return (
       <div className="map">
         <InteractiveMap
@@ -79,19 +80,20 @@ export default class Map extends Component {
             ref={(r) => (this.contextMenu = r)}
             x={contextMenu.x}
             y={contextMenu.y}
+            {...lngLat}
             actions={[
+              // {
+              //   title: "Leć natychmiast",
+              //   onClick: () => {
+              //     this.props.onFlyImmediately(lngLat);
+              //     this.setState({ contextMenu: null });
+              //   },
+              //   color: "secondary",
+              // },
               {
-                title: "leć",
-                action: () => {
-                  this.props.onFlyImmediately(contextMenu.lngLat);
-                  this.setState({ contextMenu: null });
-                },
-                disabled: true,
-              },
-              {
-                title: "dodaj punkt",
-                action: () => {
-                  this.props.onWaypointAdd(contextMenu.lngLat);
+                title: "Dodaj do trasy",
+                onClick: () => {
+                  this.props.onWaypointAdd(lngLat);
                   this.setState({ contextMenu: null });
                 },
               },
@@ -120,7 +122,8 @@ export default class Map extends Component {
       contextMenu: {
         x: event.center.x,
         y: event.center.y,
-        lngLat: event.lngLat,
+        longitude: event.lngLat[0],
+        latitude: event.lngLat[1],
       },
     });
   }

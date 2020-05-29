@@ -17,7 +17,7 @@ export default class Sidebar extends Component {
         <h1>Trasa</h1>
         <div>
           {waypoints.map((x, i) => (
-            <Waypoint key={`waypoint_${i}`} lngLat={x} />
+            <Waypoint key={`waypoint_${i}`} i={i} {...x} />
           ))}
         </div>
 
@@ -29,12 +29,7 @@ export default class Sidebar extends Component {
           >
             Start
           </Button>
-          <Button
-            className="actions__stop"
-            disabled
-            variant="contained"
-            color="primary"
-          >
+          <Button className="actions__stop" variant="contained" color="primary">
             Stop
           </Button>
         </Grid>

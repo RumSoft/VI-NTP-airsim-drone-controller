@@ -3,7 +3,7 @@ import { Grid } from "@material-ui/core";
 import { Map, Sidebar } from "./components";
 import { DroneService } from "./services";
 import "./app.scss";
-import { WithPooling } from "./utils";
+import { WithPooling, RandomColor } from "./utils";
 
 class App extends Component {
   constructor(props) {
@@ -36,6 +36,13 @@ class App extends Component {
     });
   }
 
+  addWaypoint(wp) {
+    wp = { ...wp, color: RandomColor() };
+    this.setState({ waypoints: [...this.state.waypoints, wp] });
+  }
+
+  // flyTo(wp) {}
+
   render() {
     return (
       <Grid container className="layout">
@@ -44,12 +51,9 @@ class App extends Component {
             <Map
               latitude={this.state.latitude}
               longitude={this.state.longitude}
-              onWaypointAdd={(wp) => {
-                this.setState({ waypoints: [...this.state.waypoints, wp] });
-              }}
-              onFlyImmediately={(wp) => {
-                this.setState({ waypoints: [...this.state.waypoints, wp] });
-              }}
+              onWaypointAdd={(wp) => this.addWaypoint(wp)}
+              // onFlyImmediately={(wp) => this.flyTo(wp)}
+              waypoints={this.state.waypoints}
             />
           )}
         </Grid>
