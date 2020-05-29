@@ -5,34 +5,21 @@ import { DroneService } from "../../services";
 import droneIcon from "./drone-icon-arrow.png";
 import map from "./map.jpg";
 import "./index.scss";
+import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
 
 export default class Map extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       viewport: {
         width: "100%",
         height: "100vh",
         zoom: 17,
-      },
-      drone: {},
-      pooling: {
-        delay: 500,
+        latitude: props.latitude,
+        longitude: props.longitude,
       },
     };
-
-    //init & move map to drone
-    DroneService.getState().then((x) => {
-      this.setState({
-        viewport: {
-          ...this.state.viewport,
-          longitude: x.longitude,
-          latitude: x.latitude,
-        },
-        drone: x,
-      });
-    });
 
     window.addEventListener("resize", () => {
       this.setState({
@@ -46,64 +33,61 @@ export default class Map extends Component {
   }
 
   render() {
-    const drone = this.state.drone;
+    const map_context_menu = "map_context_menu";
+
     return (
       <div ref={(r) => (this.container = r)}>
-        <InteractiveMap
-          ref={(r) => (this.map = r)}
-          {...this.state.viewport}
-          mapStyle={Config.MAPBOX_STYLE}
-          mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
-          onViewportChange={(viewport) => this.setState({ viewport })}
-          onContextMenu={(e) => this.handleRightClickMenu(e)}
-        >
-          <Marker
-            latitude={drone.latitude || 0}
-            longitude={drone.longitude || 0}
+        <ContextMenuTrigger id={map_context_menu}>
+          <InteractiveMap
+            ref={(r) => (this.map = r)}
+            {...this.state.viewport}
+            mapStyle={Config.MAPBOX_STYLE}
+            mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
+            onViewportChange={(viewport) => this.setState({ viewport })}
+            onContextMenu={(e) => this.handleRightClickMenu(e)}
           >
-            <img src={droneIcon} className="drone-icon" />
-          </Marker>
-        </InteractiveMap>
-        <canvas
-          id="myCanvas"
-          ref={(r) => (this.canvas = r)}
-          width="1540"
-          height="1540"
-          hidden
-        ></canvas>
-        <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
+            <Marker
+              latitude={this.props.latitude}
+              longitude={this.props.longitude}
+            >
+              <img src={droneIcon} className="drone-icon" />
+            </Marker>
+          </InteractiveMap>
+          <canvas
+            id="myCanvas"
+            ref={(r) => (this.canvas = r)}
+            width="1540"
+            height="1540"
+            hidden
+          ></canvas>
+          <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
+
+          <ContextMenu id={map_context_menu}>
+            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
+              ContextMenu Item 1
+            </MenuItem>
+            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
+              ContextMenu Item 2
+            </MenuItem>
+            <MenuItem divider />
+            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
+              ContextMenu Item 3
+            </MenuItem>
+          </ContextMenu>
+        </ContextMenuTrigger>
       </div>
     );
   }
 
   componentDidMount() {
-    console.log("did mount");
     var ctx = this.canvas.getContext("2d");
     this.im.addEventListener("load", () => {
       ctx.drawImage(this.im, 0, 0);
     });
-
-    this.interval = setInterval(() => this.tick(), this.state.pooling.delay);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const delay = this.state.pooling.delay;
-    if (prevState.pooling.delay !== delay) {
-      clearInterval(this.interval);
-      this.interval = setInterval(this.tick, delay);
-    }
-  }
-
-  tick() {
-    DroneService.getState().then((x) => this.setState({ drone: x }));
   }
 
   handleRightClickMenu(event) {
     event.preventDefault();
-    console.log("xd", event);
+    console.log("xd");
   }
 }
