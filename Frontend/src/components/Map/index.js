@@ -1,11 +1,10 @@
 import React, { Component } from "react";
-import { InteractiveMap, Marker } from "react-map-gl";
+import ReactMapGL, { InteractiveMap, Marker } from "react-map-gl";
 import { Config } from "../..";
-import { DroneService } from "../../services";
 import droneIcon from "./drone-icon-arrow.png";
 import map from "./map.jpg";
 import "./index.scss";
-import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
+import ContextMenu from "./ContextMenu";
 
 export default class Map extends Component {
   constructor(props) {
@@ -18,6 +17,12 @@ export default class Map extends Component {
         zoom: 17,
         latitude: props.latitude,
         longitude: props.longitude,
+      },
+      hasRotated: false,
+      contextMenu: {
+        isOpen: false,
+        x: 0,
+        y: 0,
       },
     };
 
@@ -33,48 +38,60 @@ export default class Map extends Component {
   }
 
   render() {
-    const map_context_menu = "map_context_menu";
+    let contextMenu = this.state.contextMenu;
 
     return (
-      <div ref={(r) => (this.container = r)}>
-        <ContextMenuTrigger id={map_context_menu}>
-          <InteractiveMap
-            ref={(r) => (this.map = r)}
-            {...this.state.viewport}
-            mapStyle={Config.MAPBOX_STYLE}
-            mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
-            onViewportChange={(viewport) => this.setState({ viewport })}
-            onContextMenu={(e) => this.handleRightClickMenu(e)}
+      <div className="map">
+        <InteractiveMap
+          ref={(r) => (this.map = r)}
+          {...this.state.viewport}
+          maxPitch={0}
+          mapStyle={Config.MAPBOX_STYLE}
+          mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
+          onMouseDown={(ev) => {
+            this.setState({ contextMenu: { isOpen: false } });
+          }}
+          onViewportChange={(viewport, interactionState) => {
+            this.setState({
+              viewport,
+              hasRotated: interactionState.isRotating || false,
+              contextMenu: { isOpen: false },
+            });
+          }}
+          onContextMenu={(e) => this.handleRightClickMenu(e)}
+        >
+          <Marker
+            latitude={this.props.latitude}
+            longitude={this.props.longitude}
           >
-            <Marker
-              latitude={this.props.latitude}
-              longitude={this.props.longitude}
-            >
-              <img src={droneIcon} className="drone-icon" />
-            </Marker>
-          </InteractiveMap>
-          <canvas
-            id="myCanvas"
-            ref={(r) => (this.canvas = r)}
-            width="1540"
-            height="1540"
-            hidden
-          ></canvas>
-          <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
-
-          <ContextMenu className="context-menu" id={map_context_menu}>
-            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
-              ContextMenu Item 1
-            </MenuItem>
-            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
-              ContextMenu Item 2
-            </MenuItem>
-            <MenuItem divider />
-            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
-              ContextMenu Item 3
-            </MenuItem>
-          </ContextMenu>
-        </ContextMenuTrigger>
+            <img src={droneIcon} className="drone-icon" />
+          </Marker>
+        </InteractiveMap>
+        <canvas
+          id="myCanvas"
+          ref={(r) => (this.canvas = r)}
+          width="1540"
+          height="1540"
+          hidden
+        ></canvas>
+        <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
+        {this.state.contextMenu.isOpen && (
+          <ContextMenu
+            ref={(r) => (this.contextMenu = r)}
+            x={contextMenu.x}
+            y={contextMenu.y}
+            actions={[
+              {
+                title: "leć",
+                action: () => this.props.onFlyImmediately(contextMenu.lngLat),
+              },
+              {
+                title: "dodaj punkt",
+                action: () => this.props.onWaypointAdd(contextMenu.lngLat),
+              },
+            ]}
+          />
+        )}
       </div>
     );
   }
@@ -88,6 +105,18 @@ export default class Map extends Component {
 
   handleRightClickMenu(event) {
     event.preventDefault();
-    console.log("xd");
+    if (this.state.hasRotated) {
+      this.setState({ hasRotated: false });
+      return;
+    }
+
+    this.setState({
+      contextMenu: {
+        isOpen: true,
+        x: event.center.x,
+        y: event.center.y,
+        lngLat: event.lngLat,
+      },
+    });
   }
 }

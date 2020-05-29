@@ -1,15 +1,18 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    max-height: 100vh;
+    max-width: 100vw;
+}
+
 .layout {
 
-    .map {
+    .map-container {
         flex: 1;
     }
 
-    .sidebar {
+    .sidebar-container {
         width: 350px;
         padding: 5px;
     }
-}
-
-body {
-    margin: 0;
 }

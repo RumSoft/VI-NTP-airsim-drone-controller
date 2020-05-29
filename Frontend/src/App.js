@@ -38,7 +38,7 @@ class App extends Component {
   render() {
     return (
       <Grid container className="layout">
-        <Grid item className="map">
+        <Grid item className="map-container">
           {this.state.isDataReady && (
             <Map
               latitude={this.state.latitude}
@@ -52,7 +52,7 @@ class App extends Component {
             />
           )}
         </Grid>
-        <Grid item className="sidebar">
+        <Grid item className="sidebar-container">
           <Sidebar />
         </Grid>
       </Grid>
