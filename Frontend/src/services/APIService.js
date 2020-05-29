@@ -11,6 +11,6 @@ export default class {
     return axios.get(url).then((x) => x.data);
   }
   static post(url, data) {
-    return axios.post(url, data);
+    return axios.post(url, data).then((x) => x.data);
   }
 }

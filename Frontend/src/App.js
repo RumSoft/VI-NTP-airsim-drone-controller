@@ -3,8 +3,9 @@ import { Grid } from "@material-ui/core";
 import { Map, Sidebar } from "./components";
 import { DroneService } from "./services";
 import "./app.scss";
+import { WithPooling } from "./utils";
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,6 +22,15 @@ export default class App extends Component {
         latitude: x.latitude,
         longitude: x.longitude,
         isDataReady: true,
+      });
+    });
+  }
+
+  tick() {
+    DroneService.getState().then((x) => {
+      this.setState({
+        latitude: x.latitude,
+        longitude: x.longitude,
       });
     });
   }
@@ -49,3 +59,5 @@ export default class App extends Component {
     );
   }
 }
+
+export default WithPooling(App);
