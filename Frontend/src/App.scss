@@ -3,6 +3,7 @@ body {
     overflow: hidden;
     max-height: 100vh;
     max-width: 100vw;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .layout {
@@ -14,5 +15,7 @@ body {
     .sidebar-container {
         width: 350px;
         padding: 5px;
+        background-color: white;
+
     }
 }

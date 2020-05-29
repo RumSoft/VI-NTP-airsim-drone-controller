@@ -7,10 +7,10 @@ const withPooling = (WrappedComponent) => {
     };
 
     render() {
-      for (let i = 0; i < 100; i++)
+      for (let i = 0; i < 1000; i++)
         setTimeout(() => {
           this.tick();
-        }, i * 300);
+        }, i * 100);
 
       return <WrappedComponent ref={(r) => (this.child = r)} />;
     }

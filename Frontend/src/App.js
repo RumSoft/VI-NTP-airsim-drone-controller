@@ -12,6 +12,7 @@ class App extends Component {
       latitude: 0,
       longitude: 0,
       isDataReady: false,
+      waypoints: [],
     };
     this.init();
   }
@@ -43,17 +44,17 @@ class App extends Component {
             <Map
               latitude={this.state.latitude}
               longitude={this.state.longitude}
-              onWaypointAdd={(xd) => {
-                console.log("wp add", xd);
+              onWaypointAdd={(wp) => {
+                this.setState({ waypoints: [...this.state.waypoints, wp] });
               }}
-              onFlyImmediately={(xd) => {
-                console.log("fly", xd);
+              onFlyImmediately={(wp) => {
+                this.setState({ waypoints: [...this.state.waypoints, wp] });
               }}
             />
           )}
         </Grid>
         <Grid item className="sidebar-container">
-          <Sidebar />
+          <Sidebar waypoints={this.state.waypoints} />
         </Grid>
       </Grid>
     );

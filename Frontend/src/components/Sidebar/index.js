@@ -2,9 +2,11 @@ import React, { Component } from "react";
 import { Grid, Button } from "@material-ui/core";
 import logo from "./logo-xd.gif";
 import "./index.scss";
+import { Waypoint } from "..";
 
 export default class Sidebar extends Component {
   render() {
+    const waypoints = this.props.waypoints || [];
     return (
       <div className="sidebar">
         <img src={logo} className="logo" />
@@ -13,7 +15,11 @@ export default class Sidebar extends Component {
         <p> ////////////////////// </p>
 
         <h1>Trasa</h1>
-        <p> ////////////////////// </p>
+        <div>
+          {waypoints.map((x, i) => (
+            <Waypoint key={`waypoint_${i}`} lngLat={x} />
+          ))}
+        </div>
 
         <Grid container className="actions">
           <Button

@@ -16,6 +16,7 @@ module.exports = {
     path: OUTPUT_DIR,
     publicPath: "/",
     filename: "bundle.js",
+    libraryTarget: "commonjs2",
   },
   module: {
     rules: [

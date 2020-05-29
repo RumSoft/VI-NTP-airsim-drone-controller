@@ -18,6 +18,7 @@ export default class ContextMenu extends Component {
               variant="outlined"
               color="primary"
               onClick={x.action}
+              disabled={x.disabled}
             >
               {x.title}
             </Button>

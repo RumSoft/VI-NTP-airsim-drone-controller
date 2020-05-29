@@ -20,7 +20,6 @@ export default class Map extends Component {
       },
       hasRotated: false,
       contextMenu: {
-        isOpen: false,
         x: 0,
         y: 0,
       },
@@ -39,7 +38,6 @@ export default class Map extends Component {
 
   render() {
     let contextMenu = this.state.contextMenu;
-
     return (
       <div className="map">
         <InteractiveMap
@@ -49,13 +47,13 @@ export default class Map extends Component {
           mapStyle={Config.MAPBOX_STYLE}
           mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
           onMouseDown={(ev) => {
-            this.setState({ contextMenu: { isOpen: false } });
+            this.setState({ contextMenu: null });
           }}
           onViewportChange={(viewport, interactionState) => {
             this.setState({
               viewport,
               hasRotated: interactionState.isRotating || false,
-              contextMenu: { isOpen: false },
+              contextMenu: null,
             });
           }}
           onContextMenu={(e) => this.handleRightClickMenu(e)}
@@ -75,7 +73,8 @@ export default class Map extends Component {
           hidden
         ></canvas>
         <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
-        {this.state.contextMenu.isOpen && (
+
+        {contextMenu && (
           <ContextMenu
             ref={(r) => (this.contextMenu = r)}
             x={contextMenu.x}
@@ -83,11 +82,18 @@ export default class Map extends Component {
             actions={[
               {
                 title: "leć",
-                action: () => this.props.onFlyImmediately(contextMenu.lngLat),
+                action: () => {
+                  this.props.onFlyImmediately(contextMenu.lngLat);
+                  this.setState({ contextMenu: null });
+                },
+                disabled: true,
               },
               {
                 title: "dodaj punkt",
-                action: () => this.props.onWaypointAdd(contextMenu.lngLat),
+                action: () => {
+                  this.props.onWaypointAdd(contextMenu.lngLat);
+                  this.setState({ contextMenu: null });
+                },
               },
             ]}
           />
@@ -112,7 +118,6 @@ export default class Map extends Component {
 
     this.setState({
       contextMenu: {
-        isOpen: true,
         x: event.center.x,
         y: event.center.y,
         lngLat: event.lngLat,

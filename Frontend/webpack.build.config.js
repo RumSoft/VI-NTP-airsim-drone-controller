@@ -22,10 +22,11 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: "css-loader",
-        }),
+        // use: ExtractTextPlugin.extract({
+        //   fallback: "style-loader",
+        //   use: "css-loader",
+        // }),
+        use: [{ loader: "style-loader" }, { loader: "css-loader" }],
         include: defaultInclude,
       },
       {
