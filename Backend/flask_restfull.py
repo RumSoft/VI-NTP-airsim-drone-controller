@@ -5,9 +5,9 @@ from flask import Flask, jsonify
 from flask_restful import Api, Resource, request
 from flask_cors import CORS
 
-from Backend.drone import Drone
-from Backend.telemetry import Telemetry
-from Backend.settings import State
+from drone import Drone
+from telemetry import Telemetry
+from settings import State
 
 
 def exit_handler(signal, frame):
@@ -31,7 +31,7 @@ class Start(Resource):
 class Stop(Resource):
     def post(self):
         drone.stop()
-        return 'not_implemented_yet'
+        return 'stop called'
 
 
 class Wait(Resource):

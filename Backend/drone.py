@@ -4,8 +4,8 @@ from typing import Optional
 from airsim import MultirotorClient, Vector3r
 
 
-from Backend import settings
-from Backend.telemetry import Telemetry
+import settings
+from telemetry import Telemetry
 
 
 class Drone(Thread):
