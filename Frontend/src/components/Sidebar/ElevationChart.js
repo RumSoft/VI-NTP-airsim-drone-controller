@@ -14,7 +14,6 @@ class ElevationChart extends Component {
         value: this.props.altitude.toFixed(0) || 0,
       },
     ];
-    console.log(this.chartData);
     return (
       <div className="elevation-chart">
         <LineChart

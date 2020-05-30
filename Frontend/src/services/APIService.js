@@ -9,10 +9,10 @@ const axios = Axios.create({
 export default class {
   static get(url) {
     console.log("get", url);
-    return axios.get(url).then((x) => x.data);
+    return axios.get(url);
   }
   static post(url, data = {}) {
     console.log("post", url, data);
-    return axios.post(url, data).then((x) => x.data);
+    return axios.post(url, data);
   }
 }

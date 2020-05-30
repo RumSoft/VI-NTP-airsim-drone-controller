@@ -15,10 +15,12 @@ export default class Sidebar extends Component {
 
         <h1>Status</h1>
         <ElevationChart altitude={this.props.altitude + Math.random() * 10} />
-        <p> lat: {this.props.latitude}</p>
-        <p> long: {this.props.longitude}</p>
-        <p> alt: {this.props.altitude}</p>
-        <p> stan: {this.props.altitude}</p>
+        <div className="state">
+          <p> lat: {this.props.latitude}</p>
+          <p> long: {this.props.longitude}</p>
+          <p> alt: {this.props.altitude}</p>
+          <p> stan: {"idle"}</p>
+        </div>
 
         <h1>Trasa [Load][Save]</h1>
         <div className="waypoints">

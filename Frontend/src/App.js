@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Grid } from "@material-ui/core";
+import { Grid, Button, LinearProgress } from "@material-ui/core";
 import { Map, Sidebar } from "./components";
 import { DroneService } from "./services";
 import "./app.scss";
@@ -12,28 +12,48 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isBusy: false,
       latitude: 0,
       longitude: 0,
       isDataReady: false,
       waypoints: [],
+      state: "flying",
+      error: null,
     };
+  }
 
-    DroneService.connect().then((x) => this.init());
+  connect() {
+    this.setState({
+      isBusy: true,
+    });
+    DroneService.connect()
+      .catch((x) => this.setState({ error: "couldn't connect to api" }))
+      .then((x) => this.init());
   }
 
   //init data fetch with fallback values if no api
   init() {
+    this.setState({
+      isBusy: true,
+    });
     DroneService.getState()
       .then((x) => {
-        this.setState({
-          isDataReady: true,
-          latitude: x.latitude,
-          longitude: x.longitude,
-          altitude: x.altitude,
-        });
+        this.setState(
+          {
+            isBusy: false,
+            error: null,
+            isDataReady: true,
+            latitude: x.latitude,
+            longitude: x.longitude,
+            altitude: x.altitude,
+          },
+          () => this.props.startPooling()
+        );
       })
       .catch(() => {
         this.setState({
+          isBusy: false,
+          error: "couldn't fetch data",
           isDataReady: true,
           latitude: 47.641482, //fallback values
           longitude: -122.140364,
@@ -61,48 +81,70 @@ class App extends Component {
 
   render() {
     return (
-      <Grid container className="layout">
-        <Grid item className="map-container">
-          {this.state.isDataReady && (
-            <Map
+      <React.Fragment>
+        <Grid container className="layout">
+          <Grid item className="map-container">
+            {this.state.isDataReady && (
+              <Map
+                latitude={this.state.latitude}
+                longitude={this.state.longitude}
+                onWaypointAdd={(wp) =>
+                  this.updateWaypoints([
+                    ...this.state.waypoints,
+                    { ...wp, color: RandomColor() },
+                  ])
+                }
+                // onFlyImmediately={(wp) => this.flyTo(wp)}
+                waypoints={this.state.waypoints}
+              />
+            )}
+          </Grid>
+          <Grid item className="sidebar-container">
+            <Sidebar
               latitude={this.state.latitude}
               longitude={this.state.longitude}
-              onWaypointAdd={(wp) =>
-                this.updateWaypoints([
-                  ...this.state.waypoints,
-                  { ...wp, color: RandomColor() },
-                ])
-              }
-              // onFlyImmediately={(wp) => this.flyTo(wp)}
+              altitude={this.state.altitude}
               waypoints={this.state.waypoints}
+              onWaypointDelete={(idx) =>
+                this.updateWaypoints(
+                  this.state.waypoints.filter((x, i) => i != idx)
+                )
+              }
+              onWaypointMoveUp={(idx) =>
+                this.updateWaypoints(
+                  this.swap(this.state.waypoints, idx, idx - 1)
+                )
+              }
+              onWaypointMoveDown={(idx) =>
+                this.updateWaypoints(
+                  this.swap(this.state.waypoints, idx, idx + 1)
+                )
+              }
             />
-          )}
+          </Grid>
         </Grid>
-        <Grid item className="sidebar-container">
-          <Sidebar
-            latitude={this.state.latitude}
-            longitude={this.state.longitude}
-            altitude={this.state.altitude}
-            waypoints={this.state.waypoints}
-            onWaypointDelete={(idx) =>
-              this.updateWaypoints(
-                this.state.waypoints.filter((x, i) => i != idx)
-              )
-            }
-            onWaypointMoveUp={(idx) =>
-              this.updateWaypoints(
-                this.swap(this.state.waypoints, idx, idx - 1)
-              )
-            }
-            onWaypointMoveDown={(idx) =>
-              this.updateWaypoints(
-                this.swap(this.state.waypoints, idx, idx + 1)
-              )
-            }
-          />
-        </Grid>
-      </Grid>
+        {this.state.error && (
+          <div className="error-screen">
+            <div className="error-bar">
+              <h1>Error ( ͠° ͟ʖ ͡°)</h1>
+              <p>{this.state.error}</p>
+              <Button
+                onClick={() => this.connect()}
+                variant="contained"
+                color="secondary"
+              >
+                Reconnect
+              </Button>
+            </div>
+          </div>
+        )}
+        {this.state.isBusy && <LinearProgress className="loader" />}
+      </React.Fragment>
     );
+  }
+
+  componentDidMount() {
+    this.connect();
   }
 
   updateWaypoints(wp) {

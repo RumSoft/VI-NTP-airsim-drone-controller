@@ -1,4 +1,6 @@
 .sidebar {
+  $block-width: 1rem;
+
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -11,13 +13,21 @@
     filter: drop-shadow(0px 0px 10px rgba(orange, 0.2));
   }
 
-  p {
-    margin: 0;
+  .state p {
+    margin: 2px;
+    margin-left: calc(#{$block-width} + 5px);
+
+    &::before {
+      margin-left: calc(-#{$block-width} - 5px);
+      position: absolute;
+      content: "\00a0";
+      width: $block-width;
+      background-color: rgba(100, 100, 200, 0.5);
+    }
   }
 
 
   h1 {
-    $block-width: 1rem;
     margin: 0;
     font-weight: 400;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;

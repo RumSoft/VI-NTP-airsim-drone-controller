@@ -3,9 +3,9 @@ import APIService from "./APIService";
 export default class {
   static getState() {
     return APIService.get("/position").then((x) => ({
-      latitude: x.latitude || 47,
-      longitude: x.longitude || -120,
-      altitude: x.altitude || 0,
+      latitude: x.data.latitude || 47.64,
+      longitude: x.data.longitude || -122.14,
+      altitude: x.data.altitude || 0,
     }));
   }
 
