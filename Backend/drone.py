@@ -117,3 +117,4 @@ class Drone(Thread):
         self._send_position()
 
         self.telemetry.state = settings.State.IDLE
+        self.telemetry.waiting = False
