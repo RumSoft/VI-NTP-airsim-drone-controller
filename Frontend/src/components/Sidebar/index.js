@@ -4,6 +4,7 @@ import logo from "./logo-xd.gif";
 import "./index.scss";
 import { Waypoint } from "..";
 import { DroneService } from "../../services";
+import ElevationChart from "./ElevationChart";
 
 export default class Sidebar extends Component {
   render() {
@@ -13,8 +14,11 @@ export default class Sidebar extends Component {
         <img src={logo} className="logo" />
 
         <h1>Status</h1>
-        <p> aktualna pozycja: x,y,z; stan: leci, </p>
-        <p> </p>
+        <ElevationChart altitude={this.props.altitude + Math.random() * 10} />
+        <p> lat: {this.props.latitude}</p>
+        <p> long: {this.props.longitude}</p>
+        <p> alt: {this.props.altitude}</p>
+        <p> stan: {this.props.altitude}</p>
 
         <h1>Trasa [Load][Save]</h1>
         <div className="waypoints">

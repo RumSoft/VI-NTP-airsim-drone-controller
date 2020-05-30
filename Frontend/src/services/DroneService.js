@@ -11,6 +11,7 @@ export default class {
 
   ///route data is [ [lat,long,alt], ... ]
   static sendRoute(routeData) {
+    console.log({ route: routeData });
     return APIService.post("/route", {
       route: routeData,
     });

@@ -29,6 +29,7 @@ class App extends Component {
           isDataReady: true,
           latitude: x.latitude,
           longitude: x.longitude,
+          altitude: x.altitude,
         });
       })
       .catch(() => {
@@ -36,6 +37,7 @@ class App extends Component {
           isDataReady: true,
           latitude: 47.641482, //fallback values
           longitude: -122.140364,
+          altitude: -1,
         });
       });
   }
@@ -45,6 +47,7 @@ class App extends Component {
       this.setState({
         latitude: x.latitude,
         longitude: x.longitude,
+        altitude: x.altitude,
       });
     });
   }
@@ -77,6 +80,9 @@ class App extends Component {
         </Grid>
         <Grid item className="sidebar-container">
           <Sidebar
+            latitude={this.state.latitude}
+            longitude={this.state.longitude}
+            altitude={this.state.altitude}
             waypoints={this.state.waypoints}
             onWaypointDelete={(idx) =>
               this.updateWaypoints(
@@ -101,7 +107,12 @@ class App extends Component {
 
   updateWaypoints(wp) {
     this.setState({ waypoints: wp });
-    DroneService.sendRoute(wp.map((x) => [x.longitude, x.latitude, 30]));
+    DroneService.sendRoute(
+      wp.map((x) => ({
+        ...x,
+        altitude: 30,
+      }))
+    );
   }
 }
 
