@@ -1,6 +1,6 @@
-import airsim
 from flask import Flask, jsonify
-from flask_restful import reqparse, abort, Api, Resource, request
+from flask_restful import reqparse, Api, Resource, request
+from flask_cors import CORS
 
 from Backend.drone import Drone
 from Backend.telemetry import Telemetry
@@ -45,10 +45,13 @@ if __name__ == '__main__':
     drone = Drone(telemetry)
 
     app = Flask(__name__)
+
     api = Api(app)
     api.add_resource(Connect, '/connect')
     api.add_resource(Start, '/start')
     api.add_resource(Stop, '/stop')
     api.add_resource(Route, '/route')
     api.add_resource(Position, '/position')
+
+    CORS(app)
     app.run(debug=True)
