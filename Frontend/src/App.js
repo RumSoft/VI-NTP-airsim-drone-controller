@@ -17,7 +17,8 @@ class App extends Component {
       isDataReady: false,
       waypoints: [],
     };
-    this.init();
+
+    DroneService.connect().then((x) => this.init);
   }
 
   //init data fetch with fallback values if no api
@@ -48,11 +49,6 @@ class App extends Component {
     });
   }
 
-  addWaypoint(wp) {
-    wp = { ...wp, color: RandomColor() };
-    this.setState({ waypoints: [...this.state.waypoints, wp] });
-  }
-
   swap(arr, from, to) {
     arr.splice(from, 1, arr.splice(to, 1, arr[from])[0]);
     return arr;
@@ -68,7 +64,12 @@ class App extends Component {
             <Map
               latitude={this.state.latitude}
               longitude={this.state.longitude}
-              onWaypointAdd={(wp) => this.addWaypoint(wp)}
+              onWaypointAdd={(wp) =>
+                this.updateWaypoints([
+                  ...this.state.waypoints,
+                  { ...wp, color: RandomColor() },
+                ])
+              }
               // onFlyImmediately={(wp) => this.flyTo(wp)}
               waypoints={this.state.waypoints}
             />
@@ -77,28 +78,31 @@ class App extends Component {
         <Grid item className="sidebar-container">
           <Sidebar
             waypoints={this.state.waypoints}
-            onWaypointDelete={(idx) => {
-              this.setState({
-                waypoints: this.state.waypoints.filter((x, i) => i != idx),
-              });
-            }}
-            onWaypointMoveUp={(idx) => {
-              this.setState({
-                waypoints: this.swap(this.state.waypoints, idx, idx - 1),
-              });
-            }}
-            onWaypointMoveDown={(idx) => {
-              this.setState({
-                waypoints: this.swap(this.state.waypoints, idx, idx + 1),
-              });
-            }}
+            onWaypointDelete={(idx) =>
+              this.updateWaypoints(
+                this.state.waypoints.filter((x, i) => i != idx)
+              )
+            }
+            onWaypointMoveUp={(idx) =>
+              this.updateWaypoints(
+                this.swap(this.state.waypoints, idx, idx - 1)
+              )
+            }
+            onWaypointMoveDown={(idx) =>
+              this.updateWaypoints(
+                this.swap(this.state.waypoints, idx, idx + 1)
+              )
+            }
           />
         </Grid>
       </Grid>
     );
   }
 
-  componentDidMount() {}
+  updateWaypoints(wp) {
+    this.setState({ waypoints: wp });
+    DroneService.sendRoute(wp);
+  }
 }
 
 export default WithPooling(App);
