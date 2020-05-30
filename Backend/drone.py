@@ -23,8 +23,12 @@ class Drone(Thread):
         while not self._exit:
             self._process()
 
-    def _process(self):
+    def shutdown(self):
+        self._exit = True
+        self.client.enableApiControl(False)
+        self.client.reset()
 
+    def _process(self):
         self._update_telemetry()
         self._check_progress()
         time.sleep(0.1)
@@ -35,6 +39,8 @@ class Drone(Thread):
         self.client.enableApiControl(True)
 
     def start_flight(self):
+        self.telemetry.waiting = False
+        self.telemetry.state = settings.State.FLYING
         self._send_position()
 
     def set_target_position(self, x: float, y: float, z: float):
@@ -89,6 +95,10 @@ class Drone(Thread):
 
     def stop(self):
         self.telemetry.clear_route()
+
         position = self.telemetry.ned_position
         self.set_target_position(position.x_val, position.y_val, position.z_val)
         self._send_position()
+
+        self.telemetry.state = settings.State.IDLE
+

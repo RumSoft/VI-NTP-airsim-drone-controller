@@ -1,20 +1,31 @@
+import sys
+import signal
+
 from flask import Flask, jsonify
-from flask_restful import reqparse, Api, Resource, request
+from flask_restful import Api, Resource, request
 from flask_cors import CORS
 
 from Backend.drone import Drone
 from Backend.telemetry import Telemetry
+from Backend.settings import State
 
-parser = reqparse.RequestParser()
-parser.add_argument('route')
+
+def exit_handler(signal, frame):
+    drone.shutdown()
+    print('SHUTTING DOWN')
+    sys.exit(0)
 
 
 class Start(Resource):
     def post(self):
-        json_data = request.get_json(force=True)
-        telemetry.prepare_route(json_data)
-        drone.start_flight()
-        return 'drone started'
+        if telemetry.state == State.IDLE:
+            json_data = request.get_json(force=True)
+            telemetry.prepare_route(json_data)
+            drone.start_flight()
+            return 'drone started'
+        else:
+            error_log = f'Command rejected! Drone is in {telemetry.state} state!'
+            return error_log, 400
 
 
 class Stop(Resource):
@@ -41,6 +52,8 @@ class Position(Resource):
 
 
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, exit_handler)
+
     telemetry = Telemetry()
     drone = Drone(telemetry)
     drone.start()
@@ -56,3 +69,4 @@ if __name__ == '__main__':
 
     CORS(app)
     app.run(debug=True)
+
