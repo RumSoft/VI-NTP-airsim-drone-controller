@@ -11,10 +11,10 @@ const withPooling = (WrappedComponent) => {
         <WrappedComponent
           ref={(r) => (this.child = r)}
           startPooling={() => {
-            for (let i = 0; i < 100; i++)
+            for (let i = 0; i < 1000; i++)
               setTimeout(() => {
                 this.tick();
-              }, i * 1000);
+              }, i * 300);
           }}
         />
       );

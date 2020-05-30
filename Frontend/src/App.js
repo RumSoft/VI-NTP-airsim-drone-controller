@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { Grid, Button, LinearProgress } from "@material-ui/core";
 import { Map, Sidebar } from "./components";
 import { DroneService } from "./services";
-import "./app.scss";
 import { WithPooling, RandomColor } from "./utils";
+import "./app.scss";
 
 // this is super-singleton-class that manages all app from this state
 // >:)
@@ -13,24 +13,16 @@ class App extends Component {
     super(props);
     this.state = {
       isBusy: false,
-      latitude: 0,
-      longitude: 0,
       isDataReady: false,
+      gps_position: null,
       waypoints: [],
-      state: "flying",
+      state: "not connected",
       error: null,
     };
   }
 
-  connect() {
-    this.setState({
-      isBusy: true,
-    });
-    this.init();
-  }
-
   //init data fetch with fallback values if no api
-  init() {
+  connect() {
     this.setState({
       isBusy: true,
     });
@@ -41,9 +33,7 @@ class App extends Component {
             isBusy: false,
             error: null,
             isDataReady: true,
-            latitude: x.latitude,
-            longitude: x.longitude,
-            altitude: x.altitude,
+            ...x,
           },
           () => this.props.startPooling()
         );
@@ -52,30 +42,22 @@ class App extends Component {
         this.setState({
           isBusy: false,
           error: "couldn't fetch data",
-          isDataReady: true,
-          latitude: 47.641482, //fallback values
-          longitude: -122.140364,
-          altitude: -1,
+          isDataReady: false,
+          state: "error connecting",
+          gps_position: {
+            latitude: 47.641482, //fallback values
+            longitude: -122.140364,
+            altitude: -1,
+          },
         });
       });
   }
 
   tick() {
     return DroneService.getState().then((x) => {
-      this.setState({
-        latitude: x.latitude,
-        longitude: x.longitude,
-        altitude: x.altitude,
-      });
+      this.setState({ ...x });
     });
   }
-
-  swap(arr, from, to) {
-    arr.splice(from, 1, arr.splice(to, 1, arr[from])[0]);
-    return arr;
-  }
-
-  // flyTo(wp) {}
 
   render() {
     return (
@@ -84,25 +66,22 @@ class App extends Component {
           <Grid item className="map-container">
             {this.state.isDataReady && (
               <Map
-                latitude={this.state.latitude}
-                longitude={this.state.longitude}
+                gps_position={this.state.gps_position}
+                waypoints={this.state.waypoints}
                 onWaypointAdd={(wp) =>
                   this.updateWaypoints([
                     ...this.state.waypoints,
                     { ...wp, color: RandomColor() },
                   ])
                 }
-                // onFlyImmediately={(wp) => this.flyTo(wp)}
-                waypoints={this.state.waypoints}
               />
             )}
           </Grid>
           <Grid item className="sidebar-container">
             <Sidebar
-              latitude={this.state.latitude}
-              longitude={this.state.longitude}
-              altitude={this.state.altitude}
+              gps_position={this.state.gps_position}
               waypoints={this.state.waypoints}
+              state={(this.state.waiting && "paused") || this.state.state}
               onWaypointDelete={(idx) =>
                 this.updateWaypoints(
                   this.state.waypoints.filter((x, i) => i != idx)
@@ -147,12 +126,11 @@ class App extends Component {
 
   updateWaypoints(wp) {
     this.setState({ waypoints: wp });
-    // DroneService.sendRoute(
-    //   wp.map((x) => ({
-    //     ...x,
-    //     altitude: 30,
-    //   }))
-    // );
+  }
+
+  swap(arr, from, to) {
+    arr.splice(from, 1, arr.splice(to, 1, arr[from])[0]);
+    return arr;
   }
 }
 

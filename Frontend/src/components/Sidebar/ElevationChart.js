@@ -23,7 +23,7 @@ class ElevationChart extends Component {
           margin={{
             top: 5,
             bottom: 5,
-            left: 0,
+            left: 5,
             right: 0,
           }}
         >
@@ -31,7 +31,7 @@ class ElevationChart extends Component {
           <YAxis orientation="right" />
           <Tooltip />
           <Line
-            activeDot={{ r: 8 }}
+            activeDot={{ r: 6 }}
             isAnimationActive={false}
             type="monotone"
             dataKey="value"

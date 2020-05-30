@@ -20,8 +20,8 @@ export default class Map extends Component {
         width: "100%",
         height: "100vh",
         zoom: 17,
-        latitude: props.latitude,
-        longitude: props.longitude,
+        latitude: props.gps_position.latitude,
+        longitude: props.gps_position.longitude,
       },
       hasRotated: false,
       contextMenu: null,
@@ -44,6 +44,7 @@ export default class Map extends Component {
       latitude: contextMenu.latitude,
       longitude: contextMenu.longitude,
     };
+    const gps_position = this.props.gps_position;
 
     const polylineGeoJSON = {
       type: "Feature",
@@ -51,7 +52,6 @@ export default class Map extends Component {
       geometry: {
         type: "LineString",
         coordinates: [
-          [this.props.longitude, this.props.latitude],
           ...this.props.waypoints.map((x) => [x.longitude, x.latitude]),
         ],
       },
@@ -77,8 +77,8 @@ export default class Map extends Component {
           onContextMenu={(e) => this.handleRightClickMenu(e)}
         >
           <Marker
-            latitude={this.props.latitude}
-            longitude={this.props.longitude}
+            latitude={gps_position.latitude}
+            longitude={gps_position.longitude}
           >
             <img src={droneIcon} className="drone-icon" />
           </Marker>
@@ -114,14 +114,6 @@ export default class Map extends Component {
             y={contextMenu.y}
             {...contextMenuLngLat}
             actions={[
-              // {
-              //   title: "Leć natychmiast",
-              //   onClick: () => {
-              //     this.props.onFlyImmediately(lngLat);
-              //     this.setState({ contextMenu: null });
-              //   },
-              //   color: "secondary",
-              // },
               {
                 title: "Dodaj do trasy",
                 onClick: () => {
