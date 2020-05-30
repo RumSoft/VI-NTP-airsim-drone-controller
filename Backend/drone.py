@@ -20,7 +20,10 @@ class Drone(Thread):
 
     def run(self):
         while not self._exit:
-            self._process()
+            try:
+                self._process()
+            except BufferError:
+                pass
 
     def shutdown(self):
         self._exit = True
