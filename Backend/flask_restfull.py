@@ -48,8 +48,10 @@ class Continue(Resource):
 
 class DroneState(Resource):
     def get(self):
+        gps_position = telemetry.gps_position.__dict__
+        gps_position['altitude'] = - telemetry.ned_position.z_val
         data = {
-            'gps_position': telemetry.gps_position.__dict__,
+            'gps_position': gps_position,
             # 'ned_position': telemetry.ned_position.__dict__,
             # 'gps_home_position': telemetry.gps_home.__dict__,
             # 'ned_target_position': telemetry.target_position.__dict__,
