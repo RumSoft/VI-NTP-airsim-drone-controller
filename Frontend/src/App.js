@@ -26,9 +26,7 @@ class App extends Component {
     this.setState({
       isBusy: true,
     });
-    DroneService.connect()
-      .catch((x) => this.setState({ error: "couldn't connect to api" }))
-      .then((x) => this.init());
+    this.init();
   }
 
   //init data fetch with fallback values if no api
@@ -149,12 +147,12 @@ class App extends Component {
 
   updateWaypoints(wp) {
     this.setState({ waypoints: wp });
-    DroneService.sendRoute(
-      wp.map((x) => ({
-        ...x,
-        altitude: 30,
-      }))
-    );
+    // DroneService.sendRoute(
+    //   wp.map((x) => ({
+    //     ...x,
+    //     altitude: 30,
+    //   }))
+    // );
   }
 }
 

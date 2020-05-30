@@ -42,7 +42,11 @@ export default class Sidebar extends Component {
             className="actions__start"
             variant="contained"
             color="primary"
-            onClick={() => DroneService.start()}
+            onClick={() =>
+              DroneService.start({
+                route: waypoints.map((x) => [x.latitude, x.longitude, 30]),
+              })
+            }
           >
             Start
           </Button>
