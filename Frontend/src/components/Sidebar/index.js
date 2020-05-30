@@ -12,12 +12,21 @@ export default class Sidebar extends Component {
         <img src={logo} className="logo" />
 
         <h1>Status</h1>
-        <p> ////////////////////// </p>
+        <p> aktualna pozycja: x,y,z; stan: leci, </p>
+        <p> </p>
 
-        <h1>Trasa</h1>
-        <div>
+        <h1>Trasa [Load][Save]</h1>
+        <div className="waypoints">
           {waypoints.map((x, i) => (
-            <Waypoint key={`waypoint_${i}`} i={i} {...x} />
+            <Waypoint
+              key={`waypoint_${i}`}
+              i={i}
+              n={waypoints.length}
+              {...x}
+              onDelete={() => this.props.onWaypointDelete?.(i)}
+              onUp={() => this.props.onWaypointMoveUp?.(i)}
+              onDown={() => this.props.onWaypointMoveDown?.(i)}
+            />
           ))}
         </div>
 

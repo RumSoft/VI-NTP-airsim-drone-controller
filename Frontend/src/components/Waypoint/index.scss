@@ -1,3 +1,35 @@
 .waypoint {
-    border: 1px solid black;
+  $margin: 5px;
+  $height: 40px;
+  margin-right: 2px; //from scroll
+
+  margin-top: $margin;
+  margin-bottom: $margin;
+  height: $height;
+
+  border: 1px solid black;
+  display: flex;
+
+  p {
+    margin: 0;
+  }
+  button {
+    padding: 0;
+  }
+
+  &__label {
+    line-height: $height;
+    flex: 1;
+    text-align: center;
+  }
+
+  &__block {
+    height: $height;
+    width: 15px;
+  }
+
+  &__actions {
+    display: flex;
+    padding: 1px;
+  }
 }
