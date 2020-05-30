@@ -9,30 +9,31 @@ parser = reqparse.RequestParser()
 parser.add_argument('route')
 
 
-class Connect(Resource):
-    def post(self):
-        drone.connect()
-        return 'connected or tried XD'
-
-
 class Start(Resource):
     def post(self):
-        drone.start()
-        return 'start'
+        json_data = request.get_json(force=True)
+
+        telemetry.prepare_route(json_data)
+        drone.start_flight = True
+        return 'drone started'
 
 
 class Stop(Resource):
     def post(self):
+        drone.stop()
         return 'not_implemented_yet'
 
 
-class Route(Resource):
+class Wait(Resource):
     def post(self):
-        json_data = request.get_json(force=True)
-        telemetry.route.parse_route(json_data)
-        telemetry.route.prepare_route()
-        print(telemetry.route.route)
-        return 'takeoff called'
+        drone.wait()
+        return 'wait called'
+
+
+class Continue(Resource):
+    def post(self):
+        drone.continue_flight()
+        return 'continue called'
 
 
 class Position(Resource):
@@ -43,14 +44,15 @@ class Position(Resource):
 if __name__ == '__main__':
     telemetry = Telemetry()
     drone = Drone(telemetry)
+    drone.start()
 
     app = Flask(__name__)
 
     api = Api(app)
-    api.add_resource(Connect, '/connect')
+    api.add_resource(Wait, '/wait')
+    api.add_resource(Continue, '/continue')
     api.add_resource(Start, '/start')
     api.add_resource(Stop, '/stop')
-    api.add_resource(Route, '/route')
     api.add_resource(Position, '/position')
 
     CORS(app)
