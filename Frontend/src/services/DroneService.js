@@ -8,8 +8,12 @@ export default class {
       altitude: x.altitude || 0,
     }));
   }
-  static sendRoute(route) {
-    return APIService.post("/route", route);
+
+  ///route data is [ [lat,long,alt], ... ]
+  static sendRoute(routeData) {
+    return APIService.post("/route", {
+      route: routeData,
+    });
   }
   static start() {
     return APIService.post("/start");
@@ -18,7 +22,6 @@ export default class {
     return APIService.post("/start");
   }
   static connect() {
-    console.log("connecting");
     return APIService.post("/connect");
   }
 }

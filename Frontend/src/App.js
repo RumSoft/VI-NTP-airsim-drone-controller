@@ -18,7 +18,7 @@ class App extends Component {
       waypoints: [],
     };
 
-    DroneService.connect().then((x) => this.init);
+    DroneService.connect().then((x) => this.init());
   }
 
   //init data fetch with fallback values if no api
@@ -101,7 +101,7 @@ class App extends Component {
 
   updateWaypoints(wp) {
     this.setState({ waypoints: wp });
-    DroneService.sendRoute(wp);
+    DroneService.sendRoute(wp.map((x) => [x.longitude, x.latitude, 30]));
   }
 }
 

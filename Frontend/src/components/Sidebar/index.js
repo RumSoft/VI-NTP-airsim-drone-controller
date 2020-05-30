@@ -3,6 +3,7 @@ import { Grid, Button } from "@material-ui/core";
 import logo from "./logo-xd.gif";
 import "./index.scss";
 import { Waypoint } from "..";
+import { DroneService } from "../../services";
 
 export default class Sidebar extends Component {
   render() {
@@ -35,10 +36,16 @@ export default class Sidebar extends Component {
             className="actions__start"
             variant="contained"
             color="primary"
+            onClick={() => DroneService.start()}
           >
             Start
           </Button>
-          <Button className="actions__stop" variant="contained" color="primary">
+          <Button
+            className="actions__stop"
+            variant="contained"
+            color="primary"
+            onClick={() => DroneService.stop()}
+          >
             Stop
           </Button>
         </Grid>
