@@ -46,9 +46,17 @@ class Continue(Resource):
         return 'continue called'
 
 
-class Position(Resource):
+class DroneState(Resource):
     def get(self):
-        return jsonify(telemetry.gps_position.__dict__)
+        data = {
+            'gps_position': telemetry.gps_position.__dict__,
+            # 'ned_position': telemetry.ned_position.__dict__,
+            # 'gps_home_position': telemetry.gps_home.__dict__,
+            # 'ned_target_position': telemetry.target_position.__dict__,
+            'state': telemetry.state,
+            'waiting': telemetry.waiting,
+        }
+        return jsonify(data)
 
 
 if __name__ == '__main__':
@@ -65,7 +73,7 @@ if __name__ == '__main__':
     api.add_resource(Continue, '/continue')
     api.add_resource(Start, '/start')
     api.add_resource(Stop, '/stop')
-    api.add_resource(Position, '/position')
+    api.add_resource(DroneState, '/drone-state')
 
     CORS(app)
     app.run(debug=True)
