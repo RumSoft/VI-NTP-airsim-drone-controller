@@ -4,8 +4,8 @@ from typing import Optional
 from airsim import MultirotorClient, Vector3r
 
 
-from Backend import settings
-from Backend.telemetry import Telemetry
+import settings
+from telemetry import Telemetry
 
 
 class Drone(Thread):
@@ -14,22 +14,34 @@ class Drone(Thread):
         self.daemon = True
 
         self.telemetry = telemetry
-        self._exit = False
         self.client: Optional[MultirotorClient] = None
+        self._connect()
+
+        self._exit = False
 
     def run(self):
         while not self._exit:
             self._process()
 
+    def shutdown(self):
+        self._exit = True
+        self.client.enableApiControl(False)
+        self.client.reset()
+
     def _process(self):
-        self._send_position()
         self._update_telemetry()
         self._check_progress()
+        time.sleep(0.1)
 
-    def connect(self):
+    def _connect(self):
         self.client = MultirotorClient()
         self.client.confirmConnection()
         self.client.enableApiControl(True)
+
+    def start_flight(self):
+        self.telemetry.waiting = False
+        self.telemetry.state = settings.State.FLYING
+        self._send_position()
 
     def set_target_position(self, x: float, y: float, z: float):
         self.telemetry.target_position = Vector3r(x, y, z)
@@ -38,6 +50,7 @@ class Drone(Thread):
         self.telemetry.ned_position = \
             self.client.getMultirotorState().kinematics_estimated.position
         self.telemetry.gps_position = self.client.getGpsData().gnss.geo_point
+        self.telemetry.gps_home = self.client.getHomeGeoPoint()
 
     def _check_progress(self):
         actual_position = self.telemetry.ned_position
@@ -47,8 +60,10 @@ class Drone(Thread):
 
     def _update_target_point(self):
         route = self.telemetry.route.route
-        if len(route) != 0:
-            self.telemetry.target_position = route.popleft()
+        if len(route) != 0 and not self.telemetry.waiting:
+            target = route.popleft()
+            self.telemetry.target_position = target
+            self._send_position()
 
     def takeoff(self, height: float = 10, velocity: float = 5):
         self.client.armDisarm(True)
@@ -69,9 +84,21 @@ class Drone(Thread):
         self.client.landAsync()
 
     def wait(self):
-        self.telemetry.continue_position = self.telemetry.target_position
+        self.telemetry.waiting = True
+        self.telemetry.route.route.appendleft(self.telemetry.target_position)
         position = self.telemetry.ned_position
         self.set_target_position(position.x_val, position.y_val, position.z_val)
+        self._send_position()
 
     def continue_flight(self):
-        self.telemetry.target_position = self.telemetry.continue_position
+        self.telemetry.waiting = False
+
+    def stop(self):
+        self.telemetry.clear_route()
+
+        position = self.telemetry.ned_position
+        self.set_target_position(position.x_val, position.y_val, position.z_val)
+        self._send_position()
+
+        self.telemetry.state = settings.State.IDLE
+
