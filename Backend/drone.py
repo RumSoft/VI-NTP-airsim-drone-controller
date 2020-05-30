@@ -3,7 +3,6 @@ from threading import Thread
 from typing import Optional
 from airsim import MultirotorClient, Vector3r
 
-
 import settings
 from telemetry import Telemetry
 
@@ -21,7 +20,10 @@ class Drone(Thread):
 
     def run(self):
         while not self._exit:
-            self._process()
+            try:
+                self._process()
+            except BufferError:
+                pass
 
     def shutdown(self):
         self._exit = True
@@ -47,8 +49,10 @@ class Drone(Thread):
         self.telemetry.target_position = Vector3r(x, y, z)
 
     def _update_telemetry(self):
-        self.telemetry.ned_position = \
-            self.client.getMultirotorState().kinematics_estimated.position
+        multirotor_state = self.client.getMultirotorState()
+        self.telemetry.landed_state = multirotor_state.landed_state
+        self.telemetry.ned_position = multirotor_state.kinematics_estimated.position
+        self.telemetry.linear_velocity = multirotor_state.kinematics_estimated.linear_velocity
         self.telemetry.gps_position = self.client.getGpsData().gnss.geo_point
         self.telemetry.gps_home = self.client.getHomeGeoPoint()
 
@@ -64,6 +68,18 @@ class Drone(Thread):
             target = route.popleft()
             self.telemetry.target_position = target
             self._send_position()
+
+        elif self._is_drone_stopped():
+            self.telemetry.state = settings.State.IDLE
+
+    def _is_drone_stopped(self):
+        velocity = self.telemetry.linear_velocity.dot(Vector3r(1, 1, 1))
+
+        condition = (len(self.telemetry.route.route) == 0
+                     and abs(velocity) < settings.VELOCITY_BUFFER
+                     and self.telemetry.landed_state == 1)
+
+        return condition
 
     def takeoff(self, height: float = 10, velocity: float = 5):
         self.client.armDisarm(True)
@@ -101,4 +117,3 @@ class Drone(Thread):
         self._send_position()
 
         self.telemetry.state = settings.State.IDLE
-

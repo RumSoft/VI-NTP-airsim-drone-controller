@@ -1,5 +1,6 @@
 TARGET_BUFFER: float = 3.0
 GROUNDSPEED: float = 5.0
+VELOCITY_BUFFER = 0.08
 
 
 class State:
