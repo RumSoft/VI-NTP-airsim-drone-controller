@@ -18,16 +18,12 @@ class Drone(Thread):
         self._connect()
 
         self._exit = False
-        self.start_flight = False
 
     def run(self):
         while not self._exit:
             self._process()
 
     def _process(self):
-        if self.start_flight:
-            self._send_position()
-            self.start_flight = False
 
         self._update_telemetry()
         self._check_progress()
@@ -37,6 +33,9 @@ class Drone(Thread):
         self.client = MultirotorClient()
         self.client.confirmConnection()
         self.client.enableApiControl(True)
+
+    def start_flight(self):
+        self._send_position()
 
     def set_target_position(self, x: float, y: float, z: float):
         self.telemetry.target_position = Vector3r(x, y, z)

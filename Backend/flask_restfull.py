@@ -12,9 +12,8 @@ parser.add_argument('route')
 class Start(Resource):
     def post(self):
         json_data = request.get_json(force=True)
-
         telemetry.prepare_route(json_data)
-        drone.start_flight = True
+        drone.start_flight()
         return 'drone started'
 
 
