@@ -1,11 +1,15 @@
 import React, { Component } from "react";
-import { InteractiveMap, Marker } from "react-map-gl";
+import ReactMapGL, {
+  InteractiveMap,
+  Marker,
+  Source,
+  Layer,
+} from "react-map-gl";
 import { Config } from "../..";
-import { DroneService } from "../../services";
 import droneIcon from "./drone-icon-arrow.png";
 import map from "./map.jpg";
 import "./index.scss";
-import { ContextMenuTrigger, ContextMenu, MenuItem } from "react-contextmenu";
+import ContextMenu from "./ContextMenu";
 
 export default class Map extends Component {
   constructor(props) {
@@ -19,6 +23,8 @@ export default class Map extends Component {
         latitude: props.latitude,
         longitude: props.longitude,
       },
+      hasRotated: false,
+      contextMenu: null,
     };
 
     window.addEventListener("resize", () => {
@@ -33,48 +39,99 @@ export default class Map extends Component {
   }
 
   render() {
-    const map_context_menu = "map_context_menu";
+    const contextMenu = this.state.contextMenu;
+    const contextMenuLngLat = contextMenu && {
+      latitude: contextMenu.latitude,
+      longitude: contextMenu.longitude,
+    };
 
+    const polylineGeoJSON = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [this.props.longitude, this.props.latitude],
+          ...this.props.waypoints.map((x) => [x.longitude, x.latitude]),
+        ],
+      },
+    };
     return (
-      <div ref={(r) => (this.container = r)}>
-        <ContextMenuTrigger id={map_context_menu}>
-          <InteractiveMap
-            ref={(r) => (this.map = r)}
-            {...this.state.viewport}
-            mapStyle={Config.MAPBOX_STYLE}
-            mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
-            onViewportChange={(viewport) => this.setState({ viewport })}
-            onContextMenu={(e) => this.handleRightClickMenu(e)}
+      <div className="map">
+        <InteractiveMap
+          ref={(r) => (this.map = r)}
+          {...this.state.viewport}
+          maxPitch={0}
+          mapStyle={Config.MAPBOX_STYLE}
+          mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
+          onMouseDown={(ev) => {
+            this.setState({ contextMenu: null });
+          }}
+          onViewportChange={(viewport, interactionState) => {
+            this.setState({
+              viewport,
+              hasRotated: interactionState.isRotating || false,
+              contextMenu: null,
+            });
+          }}
+          onContextMenu={(e) => this.handleRightClickMenu(e)}
+        >
+          <Marker
+            latitude={this.props.latitude}
+            longitude={this.props.longitude}
           >
-            <Marker
-              latitude={this.props.latitude}
-              longitude={this.props.longitude}
-            >
-              <img src={droneIcon} className="drone-icon" />
-            </Marker>
-          </InteractiveMap>
-          <canvas
-            id="myCanvas"
-            ref={(r) => (this.canvas = r)}
-            width="1540"
-            height="1540"
-            hidden
-          ></canvas>
-          <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
+            <img src={droneIcon} className="drone-icon" />
+          </Marker>
+          <Source id="polylineLayer" type="geojson" data={polylineGeoJSON}>
+            <Layer
+              id="lineLayer"
+              type="line"
+              source="my-data"
+              layout={{
+                "line-join": "round",
+                "line-cap": "round",
+              }}
+              paint={{
+                "line-color": "rgba(3, 170, 238, 1)",
+                "line-width": 5,
+              }}
+            />
+          </Source>
+        </InteractiveMap>
+        <canvas
+          id="myCanvas"
+          ref={(r) => (this.canvas = r)}
+          width="1540"
+          height="1540"
+          hidden
+        ></canvas>
+        <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
 
-          <ContextMenu id={map_context_menu}>
-            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
-              ContextMenu Item 1
-            </MenuItem>
-            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
-              ContextMenu Item 2
-            </MenuItem>
-            <MenuItem divider />
-            <MenuItem data={{ foo: "bar" }} onClick={this.handleClick}>
-              ContextMenu Item 3
-            </MenuItem>
-          </ContextMenu>
-        </ContextMenuTrigger>
+        {contextMenu && (
+          <ContextMenu
+            ref={(r) => (this.contextMenu = r)}
+            x={contextMenu.x}
+            y={contextMenu.y}
+            {...contextMenuLngLat}
+            actions={[
+              // {
+              //   title: "Leć natychmiast",
+              //   onClick: () => {
+              //     this.props.onFlyImmediately(lngLat);
+              //     this.setState({ contextMenu: null });
+              //   },
+              //   color: "secondary",
+              // },
+              {
+                title: "Dodaj do trasy",
+                onClick: () => {
+                  this.props.onWaypointAdd(contextMenuLngLat);
+                  this.setState({ contextMenu: null });
+                },
+              },
+            ]}
+          />
+        )}
       </div>
     );
   }
@@ -88,6 +145,18 @@ export default class Map extends Component {
 
   handleRightClickMenu(event) {
     event.preventDefault();
-    console.log("xd");
+    if (this.state.hasRotated) {
+      this.setState({ hasRotated: false });
+      return;
+    }
+
+    this.setState({
+      contextMenu: {
+        x: event.center.x,
+        y: event.center.y,
+        longitude: event.lngLat[0],
+        latitude: event.lngLat[1],
+      },
+    });
   }
 }
