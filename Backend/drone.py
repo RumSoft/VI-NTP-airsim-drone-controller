@@ -45,6 +45,7 @@ class Drone(Thread):
         self.telemetry.ned_position = \
             self.client.getMultirotorState().kinematics_estimated.position
         self.telemetry.gps_position = self.client.getGpsData().gnss.geo_point
+        self.telemetry.gps_home = self.client.getHomeGeoPoint()
 
     def _check_progress(self):
         actual_position = self.telemetry.ned_position

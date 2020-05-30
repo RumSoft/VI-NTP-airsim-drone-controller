@@ -50,6 +50,7 @@ class Telemetry:
         self.target_position: Vector3r = Vector3r(0.0, 0.0, -5.0)
         self.ned_position: Vector3r = Vector3r(0.0, 0.0, 0.0)
         self.gps_position: GeoPoint = GeoPoint()
+        self.gps_home: GeoPoint = GeoPoint()
         self.continue_position: Vector3r = Vector3r(0.0, 0.0, 0.0)
 
         self.state: str = State.IDLE
@@ -57,8 +58,8 @@ class Telemetry:
         self.route: Route = Route()
 
     def prepare_route(self, json_route: dict):
-        home_gps = Vector3r(self.gps_position.latitude,
-                            self.gps_position.longitude,
+        home_gps = Vector3r(self.gps_home.latitude,
+                            self.gps_home.longitude,
                             0.0)
         self.route.parse_route(json_route)
         self.route.prepare_route(home_gps)
