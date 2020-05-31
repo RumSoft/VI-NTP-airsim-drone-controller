@@ -11,7 +11,7 @@ class ElevationChart extends Component {
       ...this.chartData.slice(-length),
       {
         name: this.chartData.slice(-1)[0].name + 1,
-        value: this.props.altitude.toFixed(0) || 0,
+        value: this.props.altitude.toFixed(1) || 0,
       },
     ];
     return (

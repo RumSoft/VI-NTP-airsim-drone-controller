@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Grid, Button } from "@material-ui/core";
-import logo from "./logo-xd.gif";
+import logoxd from "./logo-xd.gif";
+import logo from "./logo.gif";
 import "./index.scss";
 import { Waypoint } from "..";
 import ElevationChart from "./ElevationChart";

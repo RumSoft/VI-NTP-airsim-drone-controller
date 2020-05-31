@@ -6,6 +6,7 @@ export default class {
   }
 
   static start(routeData) {
+    console.log(JSON.stringify(routeData));
     return APIService.post("/start", routeData);
   }
 
