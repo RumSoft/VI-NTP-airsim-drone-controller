@@ -1,3 +1,4 @@
+import math
 import time
 from threading import Thread
 from typing import Optional
@@ -67,6 +68,7 @@ class Drone(Thread):
         if len(route) != 0 and not self.telemetry.waiting:
             target = route.popleft()
             self.telemetry.target_position = target
+            self.set_yaw()
             self._send_position()
 
         elif self._is_drone_stopped():
@@ -117,3 +119,13 @@ class Drone(Thread):
         self._send_position()
 
         self.telemetry.state = settings.State.IDLE
+
+    def set_yaw(self):
+        actual_position = self.telemetry.ned_position
+        target_position = self.telemetry.target_position
+        yaw = math.atan2(target_position.y_val - actual_position.y_val,
+                         target_position.x_val - actual_position.x_val)
+
+        self.client.rotateToYawAsync(
+            math.degrees(yaw), settings.SET_YAW_TIMEOUT, 1
+        ).join()
