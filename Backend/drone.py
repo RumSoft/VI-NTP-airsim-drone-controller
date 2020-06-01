@@ -2,10 +2,12 @@ import math
 import time
 from threading import Thread
 from typing import Optional
-from airsim import MultirotorClient, Vector3r
+
+import airsim
+from airsim import MultirotorClient, Vector3r, ImageType
 
 import settings
-from telemetry import Telemetry
+from telemetry import Telemetry, DepthCamera
 
 
 class Drone(Thread):
@@ -51,13 +53,22 @@ class Drone(Thread):
 
     def _update_telemetry(self):
         multirotor_state = self.client.getMultirotorState()
+
         self.telemetry.landed_state = multirotor_state.landed_state
         self.telemetry.ned_position = multirotor_state.kinematics_estimated.position
         self.telemetry.linear_velocity = multirotor_state.kinematics_estimated.linear_velocity
+
         self.telemetry.gps_position = self.client.getGpsData().gnss.geo_point
         self.telemetry.gps_home = self.client.getHomeGeoPoint()
 
+        camera_data = self.client.simGetImages(
+            [airsim.ImageRequest("0", airsim.ImageType.DepthPlanner, pixels_as_float=True)]
+        )
+        self.telemetry.depth_camera = DepthCamera(camera_data[0])
+
     def _check_progress(self):
+        if self.telemetry.depth_camera.collision:
+            self.wait()
         actual_position = self.telemetry.ned_position
         target_position = self.telemetry.target_position
         if actual_position.distance_to(target_position) < settings.TARGET_BUFFER:
