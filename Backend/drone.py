@@ -29,20 +29,37 @@ class Drone(Thread):
             except BufferError:
                 pass
 
-    def shutdown(self):
-        self._exit = True
-        self.client.enableApiControl(False)
-        self.client.reset()
-
     def _process(self):
         self._update_telemetry()
         self._check_progress()
         time.sleep(0.1)
+    
+    def wait(self):
+        self.telemetry.waiting = True
+        self._pause_route()
+        self._send_position()
 
-    def _connect(self):
-        self.client = MultirotorClient()
-        self.client.confirmConnection()
-        self.client.enableApiControl(True)
+    def continue_flight(self):
+        self.telemetry.waiting = False
+
+    def stop(self):
+        self.telemetry.route.clear_route()
+
+        position = self.telemetry.ned_position
+        self.set_target_position(position.x_val, position.y_val, position.z_val)
+        self._send_position()
+
+        self.telemetry.state = settings.State.IDLE
+
+    def set_yaw(self):
+        actual_position = self.telemetry.ned_position
+        target_position = self.telemetry.target_position
+        yaw = math.atan2(target_position.y_val - actual_position.y_val,
+                         target_position.x_val - actual_position.x_val)
+
+        self.client.rotateToYawAsync(
+            math.degrees(yaw), settings.SET_YAW_TIMEOUT, 1
+        ).join()
 
     def start_flight(self):
         self.telemetry.waiting = False
@@ -51,6 +68,11 @@ class Drone(Thread):
 
     def set_target_position(self, x: float, y: float, z: float):
         self.telemetry.target_position = Vector3r(x, y, z)
+
+    def _connect(self):
+        self.client = MultirotorClient()
+        self.client.confirmConnection()
+        self.client.enableApiControl(True)
 
     def _update_telemetry(self):
         multirotor_state = self.client.getMultirotorState()
@@ -95,49 +117,18 @@ class Drone(Thread):
 
         return condition
 
-    def takeoff(self, height: float = 10, velocity: float = 5):
-        self.client.armDisarm(True)
-        self.client.moveToZAsync(height, velocity)
-
     def _send_position(self, velocity: float = settings.GROUNDSPEED):
         position: Vector3r = self.telemetry.target_position
         self.client.moveToPositionAsync(
             position.x_val, position.y_val, position.z_val, velocity
         )
 
-    def goto(self, x, y, z, velocity: float = settings.GROUNDSPEED):
-        self.client.moveToPositionAsync(
-            x, y, z, velocity
-        )
-
-    def land(self):
-        self.client.landAsync()
-
-    def wait(self):
-        self.telemetry.waiting = True
+    def _pause_route(self):
         self.telemetry.route.route.appendleft(self.telemetry.target_position)
         position = self.telemetry.ned_position
         self.set_target_position(position.x_val, position.y_val, position.z_val)
-        self._send_position()
 
-    def continue_flight(self):
-        self.telemetry.waiting = False
-
-    def stop(self):
-        self.telemetry.route.clear_route()
-
-        position = self.telemetry.ned_position
-        self.set_target_position(position.x_val, position.y_val, position.z_val)
-        self._send_position()
-
-        self.telemetry.state = settings.State.IDLE
-
-    def set_yaw(self):
-        actual_position = self.telemetry.ned_position
-        target_position = self.telemetry.target_position
-        yaw = math.atan2(target_position.y_val - actual_position.y_val,
-                         target_position.x_val - actual_position.x_val)
-
-        self.client.rotateToYawAsync(
-            math.degrees(yaw), settings.SET_YAW_TIMEOUT, 1
-        ).join()
+    def shutdown(self):
+        self._exit = True
+        self.client.enableApiControl(False)
+        self.client.reset()
