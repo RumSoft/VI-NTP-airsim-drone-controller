@@ -20,7 +20,7 @@ class Start(Resource):
     def post(self):
         if telemetry.state == State.IDLE:
             json_data = request.get_json(force=True)
-            telemetry.prepare_route(json_data)
+            telemetry.route.prepare_route(json_data, telemetry.gps_home)
             drone.start_flight()
             return 'drone started'
         else:

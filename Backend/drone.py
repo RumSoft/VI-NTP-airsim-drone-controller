@@ -123,7 +123,7 @@ class Drone(Thread):
         self.telemetry.waiting = False
 
     def stop(self):
-        self.telemetry.clear_route()
+        self.telemetry.route.clear_route()
 
         position = self.telemetry.ned_position
         self.set_target_position(position.x_val, position.y_val, position.z_val)
