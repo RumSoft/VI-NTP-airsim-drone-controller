@@ -4,10 +4,11 @@ from threading import Thread
 from typing import Optional
 
 import airsim
-from airsim import MultirotorClient, Vector3r, ImageType
+from airsim import MultirotorClient, Vector3r
 
 import settings
-from telemetry import Telemetry, DepthCamera
+from telemetry import Telemetry
+from collision import Collision
 
 
 class Drone(Thread):
@@ -64,10 +65,10 @@ class Drone(Thread):
         camera_data = self.client.simGetImages(
             [airsim.ImageRequest("0", airsim.ImageType.DepthPlanner, pixels_as_float=True)]
         )
-        self.telemetry.depth_camera = DepthCamera(camera_data[0])
+        self.telemetry.collision = Collision(camera_data[0])
 
     def _check_progress(self):
-        if self.telemetry.depth_camera.collision:
+        if self.telemetry.collision.collision:
             self.wait()
         actual_position = self.telemetry.ned_position
         target_position = self.telemetry.target_position

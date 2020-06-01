@@ -1,5 +1,5 @@
 TARGET_BUFFER: float = 3.0  # m
-GROUNDSPEED: float = 8.0  # m/s
+GROUNDSPEED: float = 5.0  # m/s
 VELOCITY_BUFFER = 0.08  # m/s
 SET_YAW_TIMEOUT = 2  # s
 COLLISION_BUFFER = 8  # m
