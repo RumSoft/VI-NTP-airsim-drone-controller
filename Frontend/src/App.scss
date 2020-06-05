@@ -17,3 +17,34 @@ body {
     background-color: white;
   }
 }
+
+
+.error-screen {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(orange, 0.2);
+  display: flex;
+
+  .error-bar {
+    width: 100%;
+    margin: auto;
+    padding: 2rem;
+
+    background: rgba(red, 0.5);
+
+    color: white;
+  }
+}
+
+.loader {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 10px;
+  z-index: 1001;
+}

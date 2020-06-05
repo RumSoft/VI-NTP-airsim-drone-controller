@@ -8,11 +8,13 @@
   height: $height;
 
   border: 1px solid black;
+  border-left-width: 0px;
   display: flex;
 
   p {
     margin: 0;
   }
+
   button {
     padding: 0;
   }
@@ -25,7 +27,7 @@
 
   &__block {
     height: $height;
-    width: 15px;
+    width: 1rem;
   }
 
   &__actions {

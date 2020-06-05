@@ -117,7 +117,8 @@ class Drone(Thread):
         self.telemetry.waiting = True
         self.telemetry.route.route.appendleft(self.telemetry.target_position)
         position = self.telemetry.ned_position
-        self.set_target_position(position.x_val, position.y_val, position.z_val)
+        self.set_target_position(
+            position.x_val, position.y_val, position.z_val)
         self._send_position()
 
     def continue_flight(self):
@@ -127,10 +128,12 @@ class Drone(Thread):
         self.telemetry.route.clear_route()
 
         position = self.telemetry.ned_position
-        self.set_target_position(position.x_val, position.y_val, position.z_val)
+        self.set_target_position(
+            position.x_val, position.y_val, position.z_val)
         self._send_position()
 
         self.telemetry.state = settings.State.IDLE
+        self.telemetry.waiting = False
 
     def set_yaw(self):
         actual_position = self.telemetry.ned_position
