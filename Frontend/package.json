@@ -11,10 +11,10 @@
   "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "prod": "webpack --config webpack.build.config.js && electron --noDevServer .",
-    "dev": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.dev.config.js",
-    "build": "webpack --config webpack.build.config.js",
-    "package": "webpack --config webpack.build.config.js",
+    "prod": "webpack --config ./config/webpack.config.prod.js && electron --noDevServer .",
+    "dev": "webpack-dev-server --hot --host 0.0.0.0 --config=./config/webpack.config.dev.js",
+    "build": "webpack --config ./config/webpack.config.dev.js",
+    "package": "webpack --config ./config/webpack.config.prod.js",
     "postpackage": "electron-packager ./ --out=./builds"
   },
   "devDependencies": {
@@ -35,6 +35,7 @@
     "fast-deep-equal": "^3.1.1",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
+    "lodash": "^4.17.15",
     "node-sass": "^4.14.1",
     "prettier": "^2.0.5",
     "react": "^16.13.1",
