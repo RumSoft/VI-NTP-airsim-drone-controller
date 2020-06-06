@@ -11,10 +11,10 @@
   "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "prod": "webpack --config ./config/webpack.config.prod.js && electron --noDevServer .",
-    "dev": "webpack-dev-server --hot --host 0.0.0.0 --config=./config/webpack.config.dev.js",
-    "build": "webpack --config ./config/webpack.config.dev.js",
-    "package": "webpack --config ./config/webpack.config.prod.js",
+    "prod": "webpack --config ./webpack.config.prod.js && electron --noDevServer .",
+    "dev": "webpack-dev-server --hot --host 0.0.0.0 --config=./webpack.config.dev.js",
+    "build": "webpack --config ./webpack.config.dev.js",
+    "package": "webpack --config ./webpack.config.prod.js",
     "postpackage": "electron-packager ./ --out=./builds"
   },
   "devDependencies": {

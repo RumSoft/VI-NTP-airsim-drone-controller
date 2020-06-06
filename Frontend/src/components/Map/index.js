@@ -61,8 +61,8 @@ export default class Map extends Component {
           ref={(r) => (this.map = r)}
           {...this.state.viewport}
           maxPitch={0}
-          mapStyle="mapbox://styles/dr124/ckb3kyztp0zzn1jmxffpf2ls3"
-          mapboxApiAccessToken="pk.eyJ1IjoiZHIxMjQiLCJhIjoiY2tiM2s2b3V3MDlseDJzbnlsMjkwNDlneiJ9.wTcTSVN4wWF2sxSKcwE82g"
+          mapStyle={config.MAPBOX_STYLE}
+          mapboxApiAccessToken={config.MAPBOX_ACCESS_TOKEN}
           onMouseDown={(ev) => {
             this.setState({ contextMenu: null });
           }}
