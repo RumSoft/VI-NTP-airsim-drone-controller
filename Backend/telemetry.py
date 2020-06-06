@@ -15,7 +15,9 @@ class Telemetry:
         self.gps_home: GeoPoint = GeoPoint()
         self.continue_position: Vector3r = Vector3r(0.0, 0.0, 0.0)
         self.linear_velocity: Vector3r = Vector3r(0.0, 0.0, 0.0)
-        self.collision: Optional[Collision] = None
+        self.wall_collision: Optional[Collision] = Collision()
+        self.terrain_collision: Optional[Collision] = Collision()
+
         self.landed_state: int = 0
 
         self.state: str = State.IDLE

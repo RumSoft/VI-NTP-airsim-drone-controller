@@ -1,6 +1,7 @@
 import sys
 import signal
 
+import pymap3d
 from flask import Flask, jsonify
 from flask_restful import Api, Resource, request
 from flask_cors import CORS
@@ -50,13 +51,20 @@ class DroneState(Resource):
     def get(self):
         gps_position = telemetry.gps_position.__dict__
         gps_position['altitude'] = - telemetry.ned_position.z_val
+        target = telemetry.target_position
+        lat, lon, alt = pymap3d.ned2geodetic(
+            target.x_val, target.y_val, target.z_val,
+            telemetry.gps_home.latitude, telemetry.gps_home.longitude, 0
+        )
+        gps_target = {
+            'latitude': lat, 'longitude': lon, 'altitude': alt
+        }
         data = {
             'gps_position': gps_position,
-            # 'ned_position': telemetry.ned_position.__dict__,
-            # 'gps_home_position': telemetry.gps_home.__dict__,
-            # 'ned_target_position': telemetry.target_position.__dict__,
+            'target_position': gps_target,
             'state': telemetry.state,
             'waiting': telemetry.waiting,
+            'collision': drone._collision_mode,
         }
         return jsonify(data)
 
@@ -78,5 +86,5 @@ if __name__ == '__main__':
     api.add_resource(DroneState, '/drone-state')
 
     CORS(app)
-    app.run(debug=True)
+    app.run(debug=False)
 
