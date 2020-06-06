@@ -1,7 +1,6 @@
 const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const BabiliPlugin = require("babili-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const base_conifg = require("./webpack.config.base");
 const merge = require("webpack-merge");
@@ -52,7 +51,6 @@ const config = merge.smart(base_conifg, {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("production"),
     }),
-    new BabiliPlugin(),
   ],
   stats: {
     colors: true,
