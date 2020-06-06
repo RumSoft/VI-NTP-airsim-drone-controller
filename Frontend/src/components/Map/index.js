@@ -5,11 +5,10 @@ import ReactMapGL, {
   Source,
   Layer,
 } from "react-map-gl";
-import { Config } from "../..";
 import droneIcon from "./drone-icon-arrow.png";
-import map from "./map.jpg";
 import "./index.scss";
 import ContextMenu from "./ContextMenu";
+import config from "../../../config/default";
 
 export default class Map extends Component {
   constructor(props) {
@@ -62,8 +61,8 @@ export default class Map extends Component {
           ref={(r) => (this.map = r)}
           {...this.state.viewport}
           maxPitch={0}
-          mapStyle={Config.MAPBOX_STYLE}
-          mapboxApiAccessToken={Config.MAPBOX_ACCESS_TOKEN}
+          mapStyle={config.MAPBOX_STYLE}
+          mapboxApiAccessToken={config.MAPBOX_ACCESS_TOKEN}
           onMouseDown={(ev) => {
             this.setState({ contextMenu: null });
           }}
@@ -98,14 +97,6 @@ export default class Map extends Component {
             />
           </Source>
         </InteractiveMap>
-        <canvas
-          id="myCanvas"
-          ref={(r) => (this.canvas = r)}
-          width="1540"
-          height="1540"
-          hidden
-        ></canvas>
-        <img id="xddd" ref={(r) => (this.im = r)} src={map} hidden />
 
         {contextMenu && (
           <ContextMenu
@@ -128,12 +119,7 @@ export default class Map extends Component {
     );
   }
 
-  componentDidMount() {
-    var ctx = this.canvas.getContext("2d");
-    this.im.addEventListener("load", () => {
-      ctx.drawImage(this.im, 0, 0);
-    });
-  }
+  componentDidMount() {}
 
   handleRightClickMenu(event) {
     event.preventDefault();
