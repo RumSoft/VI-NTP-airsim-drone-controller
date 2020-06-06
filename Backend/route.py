@@ -37,5 +37,5 @@ class Route:
         self._prepare_ned_route(home_gps)
 
     def clear_route(self):
-        self.route.route = deque()
+        self.route = deque()
 
