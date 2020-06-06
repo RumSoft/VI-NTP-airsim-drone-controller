@@ -1,4 +1,6 @@
 .sidebar {
+  $block-width: 1rem;
+
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -11,8 +13,21 @@
     filter: drop-shadow(0px 0px 10px rgba(orange, 0.2));
   }
 
+  .state p {
+    margin: 2px;
+    margin-left: calc(#{$block-width} + 5px);
+
+    &::before {
+      margin-left: calc(-#{$block-width} - 5px);
+      position: absolute;
+      content: "\00a0";
+      width: $block-width;
+      background-color: rgba(100, 100, 200, 0.5);
+    }
+  }
+
+
   h1 {
-    $block-width: 1rem;
     margin: 0;
     font-weight: 400;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -26,9 +41,18 @@
       width: $block-width;
       background-color: rgba(100, 100, 200, 0.5);
     }
+
+    span {
+      float: right;
+
+      button {
+        margin-right: 5px;
+      }
+    }
   }
 
   .waypoints {
+    margin: 5px 0;
     flex: 1;
     overflow-y: scroll;
   }
@@ -36,13 +60,21 @@
   .actions {
     button {
       flex: 1;
-      margin: 0 10px;
-    }
+      margin: 5px;
+      margin-bottom: 0;
 
-    &__start {
-    }
+      &:first-child {
+        margin-left: 0;
+      }
 
-    &__stop {
+      &:last-child {
+        margin-right: 0;
+      }
+
+      span {
+        display: flex;
+        flex-direction: column;
+      }
     }
   }
 }

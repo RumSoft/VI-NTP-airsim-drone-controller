@@ -70,7 +70,7 @@ module.exports = {
         stdio: "inherit",
       })
         .on("close", (code) => process.exit(0))
-        .on("error", (spawnError) => console.error(spawnError));
+        .on("error", (spawnError) => console.error("xD", spawnError));
     },
   },
 };

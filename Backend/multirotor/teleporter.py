@@ -1,4 +1,3 @@
-import setup_path
 import airsim
 import time
 import cv2
@@ -29,9 +28,17 @@ while True:
         pose.position.y_val += change
         client.simSetVehiclePose(pose, True, "")
 
+    if(key == 'q'):
+        pose.position.z_val -= change
+        client.simSetVehiclePose(pose, True, "")
+
+    if(key == 'e'):
+        pose.position.z_val += change
+        client.simSetVehiclePose(pose, True, "")
+
     if(key == 'p'):
         xd = client.getGpsData().gnss.geo_point
         print(xd.latitude, xd.longitude)
 
-    if (key == 27 or key == 'q' or key == 'x'):
+    if (key == 27 or key == 'z' or key == 'x'):
         break

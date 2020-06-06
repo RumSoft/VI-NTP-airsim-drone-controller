@@ -1,21 +1,41 @@
 import React, { Component } from "react";
 import { Grid, Button } from "@material-ui/core";
-import logo from "./logo-xd.gif";
+import logoxd from "./logo-xd.gif";
+import logo from "./logo.gif";
 import "./index.scss";
 import { Waypoint } from "..";
+import ElevationChart from "./ElevationChart";
+import State from "./State";
+import Actions from "./Actions";
 
 export default class Sidebar extends Component {
   render() {
     const waypoints = this.props.waypoints || [];
+    const gps_position = this.props.gps_position || {
+      latitude: -1,
+      longitude: -1,
+      altitude: -1,
+    };
+
     return (
       <div className="sidebar">
         <img src={logo} className="logo" />
 
         <h1>Status</h1>
-        <p> aktualna pozycja: x,y,z; stan: leci, </p>
-        <p> </p>
+        <ElevationChart altitude={gps_position.altitude} />
+        <State gps_position={gps_position} state={this.props.state} />
 
-        <h1>Trasa [Load][Save]</h1>
+        <h1>
+          Trasa{" "}
+          <span>
+            <Button variant="outlined" color="primary">
+              save
+            </Button>
+            <Button variant="outlined" color="secondary">
+              load
+            </Button>{" "}
+          </span>
+        </h1>
         <div className="waypoints">
           {waypoints.map((x, i) => (
             <Waypoint
@@ -31,16 +51,7 @@ export default class Sidebar extends Component {
         </div>
 
         <Grid container className="actions">
-          <Button
-            className="actions__start"
-            variant="contained"
-            color="primary"
-          >
-            Start
-          </Button>
-          <Button className="actions__stop" variant="contained" color="primary">
-            Stop
-          </Button>
+          <Actions waypoints={waypoints} state={this.props.state} />
         </Grid>
       </div>
     );
