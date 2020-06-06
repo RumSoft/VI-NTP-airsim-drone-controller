@@ -23,7 +23,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.jsx?$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -36,15 +36,15 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, "..", "app"),
-    // https://github.com/webpack/webpack/issues/1114
     libraryTarget: "commonjs2",
   },
   target: "electron-renderer",
   plugins: [
     new HtmlWebpackPlugin(),
     new webpack.DefinePlugin({
-      "process.env.NODE_ENV": JSON.stringify("development"),
+      "process.env.NODE_ENV": JSON.stringify("production"),
     }),
     new webpack.NamedModulesPlugin(),
   ],
+  mode: "production",
 };
