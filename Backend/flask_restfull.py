@@ -22,7 +22,7 @@ class Start(Resource):
         if telemetry.state == State.IDLE:
             json_data = request.get_json(force=True)
             telemetry.route.prepare_route(json_data, telemetry.gps_home)
-            drone.start_flight()
+            drone.controller.start_flight()
             return 'drone started'
         else:
             error_log = f'Command rejected! Drone is in {telemetry.state} state!'
@@ -31,19 +31,19 @@ class Start(Resource):
 
 class Stop(Resource):
     def post(self):
-        drone.stop()
+        drone.controller.stop()
         return 'stop called'
 
 
 class Wait(Resource):
     def post(self):
-        drone.wait()
+        drone.controller.wait()
         return 'wait called'
 
 
 class Continue(Resource):
     def post(self):
-        drone.continue_flight()
+        drone.controller.continue_flight()
         return 'continue called'
 
 
@@ -64,7 +64,7 @@ class DroneState(Resource):
             'target_position': gps_target,
             'state': telemetry.state,
             'waiting': telemetry.waiting,
-            'collision': drone._collision_mode,
+            'collision': drone.collision_mode,
         }
         return jsonify(data)
 
