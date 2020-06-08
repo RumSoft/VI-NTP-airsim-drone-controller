@@ -49,24 +49,8 @@ class Continue(Resource):
 
 class DroneState(Resource):
     def get(self):
-        gps_position = telemetry.gps_position.__dict__
-        gps_position['altitude'] = - telemetry.ned_position.z_val
-        target = telemetry.target_position
-        lat, lon, alt = pymap3d.ned2geodetic(
-            target.x_val, target.y_val, target.z_val,
-            telemetry.gps_home.latitude, telemetry.gps_home.longitude, 0
-        )
-        gps_target = {
-            'latitude': lat, 'longitude': lon, 'altitude': alt
-        }
-        data = {
-            'gps_position': gps_position,
-            'target_position': gps_target,
-            'state': telemetry.state,
-            'waiting': telemetry.waiting,
-            'collision': drone.collision_mode,
-        }
-        return jsonify(data)
+        drone_state = telemetry.prepare_drone_state_data()
+        return jsonify(drone_state)
 
 
 if __name__ == '__main__':

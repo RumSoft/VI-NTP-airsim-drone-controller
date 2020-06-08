@@ -15,16 +15,14 @@ class Drone(Thread):
     def __init__(self, telemetry: Telemetry):
         super(Drone, self).__init__()
         self.daemon = True
+        self._exit = False
 
         self.telemetry = telemetry
         self.client: Optional[MultirotorClient] = None
         self.connect()
 
         self.controller = Controller(self.client, self.telemetry)
-
-        self.collision_mode = False
-        self._collision_type = CollisionType.NONE
-        self._exit = False
+        self.collision_type = CollisionType.NONE
 
     def run(self):
         while not self._exit:
@@ -39,8 +37,8 @@ class Drone(Thread):
         self.update_telemetry()
 
         if self.is_collision():
-            self._process_collision()
-        elif self.collision_mode:
+            self.process_collision()
+        elif self.telemetry.collision_mode:
             self.stop_collision()
         else:
             self.controller.check_progress()
@@ -96,34 +94,34 @@ class Drone(Thread):
                      or self.telemetry.terrain_collision.collision)
         return collision
 
-    def _process_collision(self):
+    def process_collision(self):
         wall_collision = self.telemetry.wall_collision.collision
         terrain_collision = self.telemetry.terrain_collision.collision
 
         if wall_collision:
             if terrain_collision:
                 self.wall_collision()
-                self._collision_type = CollisionType.BOTH
+                self.collision_type = CollisionType.BOTH
             else:
                 self.wall_collision()
-                self._collision_type = CollisionType.WALL
+                self.collision_type = CollisionType.WALL
         else:
             if terrain_collision:
                 self.terrain_collision()
-                self._collision_type = CollisionType.TERRAIN
+                self.collision_type = CollisionType.TERRAIN
             else:
-                self._collision_type = CollisionType.NONE
+                self.collision_type = CollisionType.NONE
 
     def wall_collision(self):
-        if (self._collision_type != CollisionType.WALL
-                and self._collision_type != CollisionType.BOTH):
-            self.collision_mode = True
+        if (self.collision_type != CollisionType.WALL
+                and self.collision_type != CollisionType.BOTH):
+            self.telemetry.collision_mode = True
             self.client.moveToZAsync(-500, settings.COLLISION_SPEED)
 
     def terrain_collision(self):
-        if self._collision_type != CollisionType.TERRAIN:
+        if self.collision_type != CollisionType.TERRAIN:
             if self.telemetry.ned_position.z_val < -8:
-                self.collision_mode = True
+                self.telemetry.collision_mode = True
                 target = self.telemetry.target_position
                 actual = self.telemetry.ned_position
                 self.client.moveToPositionAsync(
@@ -131,6 +129,6 @@ class Drone(Thread):
 
     def stop_collision(self):
         self.controller.send_position()
-        self.collision_mode = False
+        self.telemetry.collision_mode = False
 
     # endregion
