@@ -68,6 +68,8 @@ class Drone(Thread):
         self.telemetry.gps_position = self.client.getGpsData().gnss.geo_point
         self.telemetry.gps_home = self.client.getHomeGeoPoint()
 
+        self.telemetry.quaternion = self.client.simGetVehiclePose().orientation
+
         self.get_front_camera_image()
         self.get_bottom_camera_image()
 

@@ -1,7 +1,8 @@
+import math
 from typing import Optional
 
 import pymap3d
-from airsim import Vector3r, GeoPoint
+from airsim import Vector3r, GeoPoint, Quaternionr
 
 from route import Route
 from collision import WallCollision, TerrainCollision
@@ -15,13 +16,14 @@ class Telemetry:
         self.gps_position: GeoPoint = GeoPoint()
         self.gps_home: GeoPoint = GeoPoint()
         self.linear_velocity: Vector3r = Vector3r(0.0, 0.0, 0.0)
+        self.quaternion: Quaternionr = Quaternionr()
 
         self.wall_collision: Optional[WallCollision] = WallCollision()
         self.terrain_collision: Optional[TerrainCollision] = TerrainCollision()
         self.collision_mode: bool = False
+        self.yaw: int = 0
 
         self.landed_state: int = 0
-
         self.state: str = State.IDLE
         self.waiting: bool = False
         self.route: Route = Route()
@@ -31,6 +33,7 @@ class Telemetry:
         gps_position['altitude'] = - self.ned_position.z_val
 
         gps_target = self.prepare_gps_target()
+        yaw = self.calculate_yaw()
 
         drone_state_data = {
             'gps_position': gps_position,
@@ -38,6 +41,7 @@ class Telemetry:
             'state': self.state,
             'waiting': self.waiting,
             'collision': self.collision_mode,
+            'yaw': yaw,
         }
         return drone_state_data
 
@@ -51,3 +55,10 @@ class Telemetry:
             'latitude': lat, 'longitude': lon, 'altitude': alt
         }
         return gps_target
+
+    def calculate_yaw(self):
+        q = self.quaternion
+        t1 = +2.0 * (q.w_val * q.z_val + q.x_val * q.y_val)
+        t2 = +1.0 - 2.0 * (q.y_val * q.y_val + q.z_val * q.z_val)
+        yaw = math.degrees(math.atan2(t1, t2))
+        return int(yaw)
