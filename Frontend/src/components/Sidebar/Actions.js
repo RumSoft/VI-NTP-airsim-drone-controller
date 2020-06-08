@@ -10,7 +10,6 @@ export default (props) => {
   const hasWaypoints = !!props.waypoints.length;
   const isFlying = props.state == "flying";
   const isPaused = props.state == "paused";
-  console.log(props);
   return (
     <React.Fragment>
       <Button
@@ -20,7 +19,7 @@ export default (props) => {
         disabled={!hasWaypoints || !isIdle}
         onClick={() =>
           DroneService.start({
-            route: props.waypoints.map((x) => [x.latitude, x.longitude, 20]),
+            route: props.waypoints.map((x) => [x.latitude, x.longitude, 10]),
           })
         }
       >

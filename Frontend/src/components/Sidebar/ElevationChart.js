@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { LineChart, Line, YAxis, CartesianGrid, Tooltip } from "recharts";
-const length = 10;
+const length = 30;
 
 class ElevationChart extends Component {
   chartData = [

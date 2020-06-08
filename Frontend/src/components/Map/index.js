@@ -55,6 +55,19 @@ export default class Map extends Component {
         ],
       },
     };
+    const target = this.props.target;
+
+    const targetLine = {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [gps_position.longitude, gps_position.latitude],
+          target && [target.longitude, target.latitude],
+        ],
+      },
+    };
     return (
       <div className="map">
         <InteractiveMap
@@ -96,6 +109,23 @@ export default class Map extends Component {
               }}
             />
           </Source>
+          {target && (
+            <Source id="polylineLayer2" type="geojson" data={targetLine}>
+              <Layer
+                id="lineLayer2"
+                type="line"
+                source="my-data"
+                layout={{
+                  "line-join": "round",
+                  "line-cap": "round",
+                }}
+                paint={{
+                  "line-color": "rgba(238, 170, 3, 0.5)",
+                  "line-width": 5,
+                }}
+              />
+            </Source>
+          )}
         </InteractiveMap>
 
         {contextMenu && (

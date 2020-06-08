@@ -60,6 +60,11 @@ class App extends Component {
   }
 
   render() {
+    const waypoints = this.state.waypoints;
+    const target =
+      (this.state.state == "flying" && this.state.target_position) ||
+      (waypoints && waypoints[0]) ||
+      null;
     return (
       <React.Fragment>
         <Grid container className="layout">
@@ -74,13 +79,14 @@ class App extends Component {
                     { ...wp, color: RandomColor() },
                   ])
                 }
+                target={target}
               />
             )}
           </Grid>
           <Grid item className="sidebar-container">
             <Sidebar
               gps_position={this.state.gps_position}
-              waypoints={this.state.waypoints}
+              waypoints={waypoints}
               state={(this.state.waiting && "paused") || this.state.state}
               onWaypointDelete={(idx) =>
                 this.updateWaypoints(
