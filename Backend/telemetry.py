@@ -3,7 +3,7 @@ from typing import Optional
 from airsim import Vector3r, GeoPoint
 
 from route import Route
-from collision import Collision
+from collision import WallCollision, TerrainCollision
 from settings import State, COLLISION_BUFFER
 
 
@@ -13,10 +13,10 @@ class Telemetry:
         self.ned_position: Vector3r = Vector3r(0.0, 0.0, 0.0)
         self.gps_position: GeoPoint = GeoPoint()
         self.gps_home: GeoPoint = GeoPoint()
-        self.continue_position: Vector3r = Vector3r(0.0, 0.0, 0.0)
         self.linear_velocity: Vector3r = Vector3r(0.0, 0.0, 0.0)
-        self.wall_collision: Optional[Collision] = Collision()
-        self.terrain_collision: Optional[Collision] = Collision()
+
+        self.wall_collision: Optional[WallCollision] = WallCollision()
+        self.terrain_collision: Optional[TerrainCollision] = TerrainCollision()
 
         self.landed_state: int = 0
 

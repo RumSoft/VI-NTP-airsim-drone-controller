@@ -2,21 +2,13 @@ import math
 import time
 from threading import Thread
 from typing import Optional
-from unittest.mock import MagicMock
 
 import airsim
 from airsim import MultirotorClient, Vector3r, Quaternionr
 
 import settings
 from telemetry import Telemetry
-from collision import Collision
-
-
-class CollisionType:
-    WALL = 'wall'
-    TERRAIN = 'terrain'
-    BOTH = 'both'
-    NONE = 'none'
+from collision import CollisionType
 
 
 class Drone(Thread):
@@ -40,7 +32,7 @@ class Drone(Thread):
                 pass
 
     def _process(self):
-        self._update_telemetry()
+        self.update_telemetry()
 
         if self.is_collision():
             self._process_collision()
@@ -52,13 +44,13 @@ class Drone(Thread):
         time.sleep(0.1)
 
     def is_collision(self):
-        collision = (self.telemetry.wall_collision.wall_collision
-                     or self.telemetry.terrain_collision.terrain_collision)
+        collision = (self.telemetry.wall_collision.collision
+                     or self.telemetry.terrain_collision.collision)
         return collision
 
     def _process_collision(self):
-        wall_collision = self.telemetry.wall_collision.wall_collision
-        terrain_collision = self.telemetry.terrain_collision.terrain_collision
+        wall_collision = self.telemetry.wall_collision.collision
+        terrain_collision = self.telemetry.terrain_collision.collision
 
         if wall_collision:
             if terrain_collision:
@@ -114,7 +106,7 @@ class Drone(Thread):
         self.client.confirmConnection()
         self.client.enableApiControl(True)
 
-    def _update_telemetry(self):
+    def update_telemetry(self):
         multirotor_state = self.client.getMultirotorState()
 
         self.telemetry.landed_state = multirotor_state.landed_state
@@ -123,20 +115,23 @@ class Drone(Thread):
 
         self.telemetry.gps_position = self.client.getGpsData().gnss.geo_point
         self.telemetry.gps_home = self.client.getHomeGeoPoint()
-        self._get_camera_data()
 
-    def _get_camera_data(self):
-        self.client.simSetCameraOrientation(0, Quaternionr(0.0, 0.0, 0.0, 1.0))
-        wall_camera_data = self.client.simGetImages(
-            [airsim.ImageRequest("0", airsim.ImageType.DepthPlanner, pixels_as_float=True)]
-        )
+        self.get_front_camera_image()
+        self.get_bottom_camera_image()
+
+    def get_bottom_camera_image(self):
         self.client.simSetCameraOrientation(0, Quaternionr(0.0, -0.7, 0.0, 0.5))
-        terrain_camera_data = self.client.simGetImages(
+        bottom_camera_data = self.client.simGetImages(
             [airsim.ImageRequest("0", airsim.ImageType.DepthPlanner, pixels_as_float=True)]
         )
+        self.telemetry.terrain_collision.process_image(bottom_camera_data[0])
 
-        self.telemetry.wall_collision.process_wall_image(wall_camera_data[0])
-        self.telemetry.terrain_collision.process_terrain_image(terrain_camera_data[0])
+    def get_front_camera_image(self):
+        self.client.simSetCameraOrientation(0, Quaternionr(0.0, 0.0, 0.0, 1.0))
+        front_camera_data = self.client.simGetImages(
+            [airsim.ImageRequest("0", airsim.ImageType.DepthPlanner, pixels_as_float=True)]
+        )
+        self.telemetry.wall_collision.process_image(front_camera_data[0])
 
     def _check_progress(self):
         actual_position = self.telemetry.ned_position
