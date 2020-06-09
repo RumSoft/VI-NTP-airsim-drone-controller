@@ -28,10 +28,19 @@ export default class Sidebar extends Component {
         <h1>
           Trasa{" "}
           <span>
-            <Button variant="outlined" color="primary">
+            <Button
+              disabled={!waypoints.length}
+              variant="outlined"
+              onClick={() => this.props.SaveWaypoints?.()}
+              color="primary"
+            >
               save
             </Button>
-            <Button variant="outlined" color="secondary">
+            <Button
+              variant="outlined"
+              onClick={() => this.props.OpenLoadWaypoints?.()}
+              color="secondary"
+            >
               load
             </Button>{" "}
           </span>

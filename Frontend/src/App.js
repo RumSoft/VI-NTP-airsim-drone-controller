@@ -3,7 +3,9 @@ import { Grid, Button, LinearProgress } from "@material-ui/core";
 import { Map, Sidebar } from "./components";
 import { DroneService } from "./services";
 import { WithPooling, RandomColor } from "./utils";
+const { dialog } = require("electron").remote;
 import "./app.scss";
+import fs from "fs";
 
 // this is super-singleton-class that manages all app from this state
 // >:)
@@ -103,6 +105,41 @@ class App extends Component {
                   this.swap(this.state.waypoints, idx, idx + 1)
                 )
               }
+              SaveWaypoints={() => {
+                dialog
+                  .showSaveDialog({
+                    filters: [{ name: "pliki json", extensions: ["json"] }],
+                    properties: ["openFile", "createDirectory"],
+                  })
+                  .then((result) => {
+                    if (result.canceled) return;
+                    fs.writeFileSync(
+                      result.filePath,
+                      JSON.stringify(waypoints)
+                    );
+                  })
+                  .catch((err) => {
+                    alert(`błąd zapisu trasy: ${err}`);
+                  });
+              }}
+              OpenLoadWaypoints={() => {
+                dialog
+                  .showOpenDialog({
+                    properties: ["openFile"],
+                  })
+                  .then((result) => {
+                    if (result.canceled) return;
+                    let data = fs.readFileSync(
+                      result.filePaths[0],
+                      "utf-8",
+                      "r"
+                    );
+                    this.setState({ waypoints: JSON.parse(data) });
+                  })
+                  .catch((err) => {
+                    alert(`błąd wczytywania trasy: ${err}`);
+                  });
+              }}
             />
           </Grid>
         </Grid>
