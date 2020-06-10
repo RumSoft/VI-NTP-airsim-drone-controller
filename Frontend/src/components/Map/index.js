@@ -91,8 +91,16 @@ export default class Map extends Component {
           <Marker
             latitude={gps_position.latitude}
             longitude={gps_position.longitude}
+            offsetLeft={-25}
+            offsetTop={-25}
           >
-            <img src={droneIcon} className="drone-icon" />
+            <img
+              src={droneIcon}
+              style={{
+                transform: `rotate(${this.props.rotation}deg)`,
+              }}
+              className="drone-icon"
+            />
           </Marker>
           <Source id="polylineLayer" type="geojson" data={polylineGeoJSON}>
             <Layer

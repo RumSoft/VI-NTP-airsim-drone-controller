@@ -82,6 +82,7 @@ class App extends Component {
                   ])
                 }
                 target={target}
+                rotation={this.state.yaw}
               />
             )}
           </Grid>
